@@ -11,6 +11,10 @@ namespace Dal
 
         public IRentals Rentals { get; }
         
+        public IGownDetails gownDetail { get; }
+
+        public IGownModel gownModel { get; }
+
         public DalManager()
         {
             ServiceCollection services = new ServiceCollection();
@@ -21,13 +25,12 @@ namespace Dal
             ServiceProvider provider = services.BuildServiceProvider();
             Rentals=provider.GetRequiredService<IRentals>();
             RentalDetails= provider.GetRequiredService<IRentalDetails>();
-            // DataManager db = new();
-            // Products=new ProductService(db);
+            services.AddSingleton<IGownModel, GownModelService>();
+            services.AddSingleton<IGownDetails, GownDetailsService>();
+            gownModel = provider.GetRequiredService<IGownModel>();
+            gownDetail = provider.GetRequiredService<IGownDetails>();
 
-
-            //  Orders = new OrdersService(db);
         }
-
 
     }
 }

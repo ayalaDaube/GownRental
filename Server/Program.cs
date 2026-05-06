@@ -1,7 +1,5 @@
-
 using Bl;
 using Bl.Api;
-
 namespace Server
 {
     public class Program
@@ -11,12 +9,11 @@ namespace Server
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddScoped<IBl,BLManager>();
+            builder.Services.AddSingleton<IBl, BLManager>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
 
             var app = builder.Build();
 

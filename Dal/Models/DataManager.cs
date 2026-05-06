@@ -21,9 +21,7 @@ public partial class DataManager : DbContext
 
     public virtual DbSet<GownModel> GownModels { get; set; }
 
-    public virtual DbSet<ModelDetails> ModelDetails 
-    
-    { get; set; }
+    public virtual DbSet<ModelDetails> ModelDetails { get; set; }
 
     public virtual DbSet<Rental> Rentals { get; set; }
 
@@ -31,7 +29,7 @@ public partial class DataManager : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\E0583\\Bina\\SecondYear\\esther_project\\GownRental\\GownRental\\Dal\\database\\DB.mdf;Integrated Security=True;Connect Timeout=30");
+        => optionsBuilder.UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=H:\\GownRental\\Dal\\database\\DB.mdf;Integrated Security=True;Connect Timeout=30");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -131,6 +129,10 @@ public partial class DataManager : DbContext
             entity.Property(e => e.EventDate).HasColumnName("eventDate");
             entity.Property(e => e.RentalDate).HasColumnName("rentalDate");
 
+            entity.HasOne(d => d.Customer).WithMany(p => p.Rentals)
+                .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Rental__customer__4222D4EF");
         });
 
         modelBuilder.Entity<RentalDetails>(entity =>
@@ -141,6 +143,10 @@ public partial class DataManager : DbContext
             entity.Property(e => e.RentalId).HasColumnName("rentalId");
             entity.Property(e => e.Size).HasColumnName("size");
 
+            entity.HasOne(d => d.Rental).WithMany(p => p.RentalDetails)
+                .HasForeignKey(d => d.RentalId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__RentalDet__renta__4316F928");
         });
 
         OnModelCreatingPartial(modelBuilder);

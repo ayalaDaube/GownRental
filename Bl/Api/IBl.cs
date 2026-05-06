@@ -10,5 +10,6 @@ namespace Bl.Api
     {
         public IBLRentals BLRentals { get; }
 
+        public IBLGowns BLGowns { get; }
     }
 }
