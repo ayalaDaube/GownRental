@@ -11,20 +11,19 @@ using System.Threading.Tasks;
 
 namespace Bl
 {
-    public class BLManager:IBl
+    public class BLManager:IBl 
     {
-        public IBLGowns BLGowns { get; }
-        //qqשנשתמש. להוסיף את כל הסרויסים
+        public IBLRentals BLRentals { get; }
+         public IBLGowns BLGowns { get; }
         public BLManager()
         {
-           ServiceCollection services = new ServiceCollection();
-            services.AddSingleton <IDal,DalManager >();   
+            ServiceCollection services = new ServiceCollection();
+            services.AddSingleton<IDal,DalManager>();
+            services.AddScoped<IBLRentals, BLRentalService>();
             services.AddScoped<IBLGowns, BLGownModelService>(); 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
-
-            BLGowns= serviceProvider.GetService<IBLGowns>();    
-
-            //BLGownModel=new BLGownModelService(dal.GownModel)
-        }
+            BLRentals = serviceProvider.GetService<IBLRentals>();
+            BLGowns= serviceProvider.GetService<IBLGowns>();  
+          }
     }
 }

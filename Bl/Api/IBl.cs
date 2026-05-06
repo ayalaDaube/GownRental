@@ -8,6 +8,8 @@ namespace Bl.Api
 {
     public interface IBl
     {
+        public IBLRentals BLRentals { get; }
+
         public IBLGowns BLGowns { get; }
     }
 }

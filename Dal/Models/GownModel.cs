@@ -14,6 +14,8 @@ public partial class GownModel
     public string Color { get; set; } = null!;
 
     public string? Description { get; set; }
+  
+    public bool isAvailable { get; set; }
 
     public virtual ICollection<ModelDetails> ModelDetails { get; set; } = new List<ModelDetails>();
 }
