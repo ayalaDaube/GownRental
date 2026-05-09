@@ -143,10 +143,10 @@ public partial class DataManager : DbContext
             entity.Property(e => e.RentalId).HasColumnName("rentalId");
             entity.Property(e => e.Size).HasColumnName("size");
 
-            entity.HasOne(d => d.Rental).WithMany(p => p.RentalDetails)
-                .HasForeignKey(d => d.RentalId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__RentalDet__renta__4316F928");
+            //entity.HasOne(d => d.Rental).WithMany(p => p.RentalDetails)
+            //    .HasForeignKey(d => d.RentalId)
+            //    .OnDelete(DeleteBehavior.ClientSetNull)
+            //    .HasConstraintName("FK__RentalDet__renta__4316F928");
         });
 
         OnModelCreatingPartial(modelBuilder);
