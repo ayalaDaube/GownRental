@@ -168,9 +168,8 @@ namespace Bl.Services
 
         public List<RentalFullDetaills> returningCustomers()
         {
-            DateTime currentDate = DateTime.Now;
-            currentDate=currentDate.AddDays(3);
-            var rentalNeeded = (from r in rental.GetRentals()
+            DateTime currentDate = DateTime.Now.AddDays(3);
+            return (from r in rental.GetRentals()
                     join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId
                     where r.EventDate.Year == currentDate.Year &&
                           r.EventDate.Month == currentDate.Month &&
@@ -184,18 +183,12 @@ namespace Bl.Services
                         size = rd.Size,
                         gownId = rd.GownId
                     }).ToList();
-            if (rentalNeeded == null)
-            {
-                throw new ArgumentNullException("No rentals found for the upcoming event date");
-            }
-            return rentalNeeded;
         }
 
         public List<RentalFullDetaills> rentingCustomers()
         {
-            DateTime currentDate = DateTime.Now;
-            currentDate= currentDate.AddDays(-3);
-            var rentalNeeded = (from r in rental.GetRentals()
+            DateTime currentDate = DateTime.Now.AddDays(-3);
+            return (from r in rental.GetRentals()
                     join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId
                     where r.EventDate.Year == currentDate.Year &&
                           r.EventDate.Month == currentDate.Month &&
@@ -209,11 +202,6 @@ namespace Bl.Services
                         size = rd.Size,
                         gownId = rd.GownId
                     }).ToList();
-            if (rentalNeeded == null)
-            {
-                throw new ArgumentNullException("No rentals found for the recent event date");
-            }
-            return rentalNeeded;
         }
     }
 }

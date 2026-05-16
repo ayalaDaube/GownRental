@@ -21,11 +21,20 @@ namespace Server.Controllers
         {
             return Ok(bl.getFullGowns());
         }
+
+
         [Route("available")]
         [HttpGet]
         public ActionResult<List<ModelFullDetaills>> getAvailableGowns()
         {
             return Ok(bl.getAvailableGowns());
+        }
+
+        [Route("groups")]
+        [HttpGet]
+        public ActionResult<List<ModelGrouped>> GetGroupedGowns()
+        {
+            return Ok(bl.GetModelGroupeds());
         }
 
         [HttpGet("{id}")]

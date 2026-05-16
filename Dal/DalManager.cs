@@ -21,12 +21,12 @@ namespace Dal
             services.AddDbContext<DataManager>();
             services.AddScoped<IRentalDetails, RentalDetailsService>();
             services.AddScoped<IRentals,RentalService>();
-          
+            services.AddScoped<IGownModel, GownModelService>();
+            services.AddScoped<IGownDetails, GownDetailsService>();
+
             ServiceProvider provider = services.BuildServiceProvider();
             Rentals=provider.GetRequiredService<IRentals>();
             RentalDetails= provider.GetRequiredService<IRentalDetails>();
-            services.AddSingleton<IGownModel, GownModelService>();
-            services.AddSingleton<IGownDetails, GownDetailsService>();
             gownModel = provider.GetRequiredService<IGownModel>();
             gownDetail = provider.GetRequiredService<IGownDetails>();
 

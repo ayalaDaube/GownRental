@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Bl.Services
@@ -133,6 +134,31 @@ namespace Bl.Services
                 ModelId = model.ModelId,
                 IsAvailable = model.IsAvailable,
             });
+        }
+
+        public List<ModelGrouped> GetModelGroupeds()
+        {
+            var allGowns = getFullGowns();
+            var groups = allGowns.GroupBy(g => g.ModelId);
+            var result = groups.Select(group => new ModelGrouped
+            {
+                Id = group.First().ModelId,
+                Name = group.First().Name,
+                Color = group.First().Color,
+                Description = group.First().Description,
+                Details = group.Select(g => new ModelDetails
+                {
+                    GownId = g.Id,       
+                    ModelId = g.ModelId, 
+                    Size = g.Size,
+                    Price = g.Price,
+                    IsAvailable = g.IsAvailable
+                }).ToList()
+            }).ToList();
+
+            return result;
+
+
         }
     }
 }

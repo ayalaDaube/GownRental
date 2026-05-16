@@ -15,5 +15,6 @@ namespace Bl.Api
             void updateGown(ModelFullDetaills model);
             void deleteGown(int id);
             List<ModelFullDetaills> getAvailableGowns();
+            List<ModelGrouped> GetModelGroupeds();
     }
 }
