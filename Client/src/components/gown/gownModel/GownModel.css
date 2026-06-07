@@ -1,0 +1,51 @@
+.gown-model-card {
+    background: #ffffff;
+    border: 1px solid #dce1e7;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.gown-model-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gown-model-header {
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.gown-model-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.gown-model-field span {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gown-model-field strong {
+    font-size: 15px;
+    color: #2c3e50;
+}
+
+.gown-model-toggle {
+    font-size: 14px;
+    color: #3498db;
+}
+
+.gown-model-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}

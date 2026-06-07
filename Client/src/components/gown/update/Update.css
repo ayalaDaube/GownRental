@@ -1,0 +1,111 @@
+.gown-update-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #3498db;
+  font-size: 16px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gown-update-btn:hover {
+  background-color: #eaf4fb;
+  transform: scale(1.1);
+}
+
+.gown-update-btn:active {
+  transform: scale(0.95);
+}
+
+.gown-update-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.gown-update-form {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 360px;
+}
+
+.gown-update-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e8e8e8;
+  padding-bottom: 10px;
+}
+
+.gown-update-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gown-update-fields input[type="text"],
+.gown-update-fields input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.gown-update-fields input[type="text"]:focus,
+.gown-update-fields input[type="number"]:focus {
+  border-color: #3498db;
+}
+
+.gown-update-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.gown-update-submit-btn {
+  padding: 8px 20px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.gown-update-submit-btn:hover {
+  background-color: #2980b9;
+}
+
+.gown-update-cancel-btn {
+  padding: 8px 20px;
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.gown-update-cancel-btn:hover {
+  border-color: #aaa;
+}

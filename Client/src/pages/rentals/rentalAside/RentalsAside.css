@@ -1,0 +1,79 @@
+.rentals-aside {
+    width: 240px;
+    height: fit-content;
+    min-height: 400px;
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 32px 16px 0 0;
+    border-radius: 8px;
+}
+
+.aside-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    text-align: center;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 14px;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.aside-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.aside-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0;
+    padding: 0 0 8px 0;
+    border-bottom: 1px solid #e8e8e8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.aside-section-title.returns {
+    color: #e74c3c;
+}
+
+.aside-section-title.pickups {
+    color: #27ae60;
+}
+
+.aside-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.aside-card {
+    border-radius: 4px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: #444;
+    border: 1px solid #e8e8e8;
+    text-align: center;
+}
+
+.aside-card span {
+    font-weight: 500;
+}
+
+.returns-card {
+    border-left: 2px solid #e74c3c;
+}
+
+.pickups-card {
+    border-left: 2px solid #27ae60;
+}

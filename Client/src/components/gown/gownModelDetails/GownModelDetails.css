@@ -1,0 +1,75 @@
+.gown-model-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 16px 16px 16px;
+    background: #f8f9fa;
+    border-top: 1px solid #dce1e7;
+}
+
+.gown-detail-card {
+    background: #ffffff;
+    border: 1px solid #dce1e7;
+    border-radius: 8px;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.gown-cart-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: #3498db;
+    font-size: 16px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gown-cart-btn:hover {
+    background-color: #eaf4fb;
+    transform: scale(1.1);
+}
+
+.gown-cart-btn--active {
+    color: #e74c3c;
+    background-color: #fdecea;
+}
+
+.gown-cart-btn--disabled,
+.gown-cart-btn:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    background: none;
+}
+
+.gown-cart-btn:disabled:hover {
+    transform: none;
+    background: none;
+}
+
+.gown-detail-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.gown-detail-field span {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gown-detail-field strong {
+    font-size: 14px;
+    color: #2c3e50;
+}

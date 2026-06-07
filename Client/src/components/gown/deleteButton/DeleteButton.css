@@ -1,0 +1,22 @@
+.gown-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 16px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gown-delete-btn:hover {
+  background-color: #fdecea;
+  transform: scale(1.1);
+}
+
+.gown-delete-btn:active {
+  transform: scale(0.95);
+}
