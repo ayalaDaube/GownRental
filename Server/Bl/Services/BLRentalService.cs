@@ -129,6 +129,8 @@ namespace Bl.Services
             }
             this.rental.updateRental(new Rental()
             {
+// I added!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                Id = updatedRental.rentalId,
                 CustomerId = updatedRental.customerId,
                 EventDate = updatedRental.eventDate,
                 RentalDate = updatedRental.rentalDate
