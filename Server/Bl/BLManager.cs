@@ -13,11 +13,14 @@ namespace Bl
     {
         public IBLRentals BLRentals { get; }
         public IBLGowns BLGowns { get; }
+        public IBLAppointment? BLAppointment { get; }
+
 
         public BLManager(IDal dal)
         {
             BLRentals = new BLRentalService(dal);
             BLGowns = new BLGownModelService(dal);
+            BLAppointment = new BLAppointmentService(dal);
         }
     }
 }

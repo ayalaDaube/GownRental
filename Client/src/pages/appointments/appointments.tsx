@@ -1,0 +1,39 @@
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAvailableAppointments } from '../../redux/Appointments/AppointmentSlice';
+import { RootState } from '../../store/store';
+import { AppointmentType } from '../../redux/Appointments/AppointmentType';
+import BookAppointment from '../../components/appointment/BookAppointment';
+import './appointments.css';
+
+function Appointments() {
+    const dispatch = useDispatch<any>();
+    const { available, isLoading } = useSelector((state: RootState) => state.appointments);
+    const [selected, setSelected] = useState<AppointmentType | null>(null);
+
+    useEffect(() => {
+        dispatch(fetchAvailableAppointments());
+    }, [dispatch]);
+
+    return (
+        <div className="appointments-page">
+            <h2>תורים פנויים</h2>
+            {isLoading && <p>טוען...</p>}
+            <div className="appointments-grid">
+                {available.length === 0 && !isLoading && (
+                    <p className="no-appointments">אין תורים פנויים</p>
+                )}
+                {available.map(a => (
+                    <div key={a.id} className="appointment-card">
+                        <div className="apt-field"><span>תאריך</span><strong>{a.appointmentDate}</strong></div>
+                        <div className="apt-field"><span>שעה</span><strong>{a.hour}</strong></div>
+                        <button className="apt-book-btn" onClick={() => setSelected(a)}>הזמן תור</button>
+                    </div>
+                ))}
+            </div>
+            {selected && <BookAppointment appointment={selected} onClose={() => setSelected(null)} />}
+        </div>
+    );
+}
+
+export default Appointments;

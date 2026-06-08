@@ -12,8 +12,6 @@ function Rentals() {
 
   useEffect(() => {
     dispatch(getRentals() as any);
-    dispatch(getReturning() as any);
-    dispatch(getRenting() as any);
   }, []);
 
   if (isLoading) {
