@@ -22,7 +22,7 @@ const Create: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const rental: RentalProps = { ...form, customerId: Number(form.customerId), gownId: Number(form.gownId), size: Number(form.size) };
+        const rental: RentalProps = { ...form, gownId: Number(form.gownId), size: Number(form.size) };
         dispatch(addRentalThunk(rental) as any).then(() => {
             dispatch(getRentals() as any);
             dispatch(getReturning() as any);

@@ -19,7 +19,7 @@ export const deleteRentalApi = async (rentalId: number): Promise<void> => {
 };
 
 export const updateRentalApi = async (rental: RentalProps): Promise<RentalProps> => {
-  const response = await axios.put(`${RENTALS_API_URL}/${rental.rentalId}`, rental);
+  const response = await axios.put(`${RENTALS_API_URL}`, rental);
   return response.data;
 };
 

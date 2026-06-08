@@ -1,13 +1,38 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8D5A3;
+  --gold-dark: #9B7B2E;
+  --rose: #F2D0D0;
+  --rose-dark: #C0747A;
+  --lavender: #E8E0F0;
+  --lavender-dark: #7E6B9E;
+  --cream: #FDFAF5;
+  --white: #FFFFFF;
+  --text-dark: #2C2422;
+  --text-mid: #7A6E6E;
+  --text-light: #B8AFAF;
+  --border: #EDE5D8;
+  --shadow: rgba(201, 168, 76, 0.12);
+  --shadow-dark: rgba(0, 0, 0, 0.05);
+  --delete: #9B59B6;
+  --delete-bg: rgba(155, 89, 182, 0.08);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Lato', sans-serif;
+  background-color: var(--cream);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+}
+
+input, button { font-family: 'Lato', sans-serif; }

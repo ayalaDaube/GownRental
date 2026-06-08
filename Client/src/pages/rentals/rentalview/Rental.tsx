@@ -4,7 +4,7 @@ import Update from '../../../components/rental/update/Update';
 
 export interface RentalProps {
     rentalId: number,
-    customerId: number,
+    customerId: string,
     rentalDate: string,
     eventDate: string,
     gownId: number,

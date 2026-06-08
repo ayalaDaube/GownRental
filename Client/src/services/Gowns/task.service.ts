@@ -29,12 +29,8 @@ export const deleteGownApi = async (id: number) => {
     const res = await axios.delete(`${GOWNS_API_URL}/${id}`);
     return res.data;
 };
-export const updateGownApi = async (id: number, gownData: any) => {
-    gownData = {
-        ...gownData,
-        isAvailable: false,
-    };
-    const res = await axios.put(`${GOWNS_API_URL}/${id}`, gownData);
+export const updateGownApi = async (gownData: any) => {
+    const res = await axios.put(`${GOWNS_API_URL}`, gownData);
     return res.data;
 };
 export const updateAvailabilityApi = async (gownData: any) => {
@@ -49,7 +45,7 @@ export const updateAvailabilityApi = async (gownData: any) => {
         price: gownData.price,
         size: gownData.size
     };
-    const res = await axios.put(`${GOWNS_API_URL}/${gownData.gownId}`, payload);
+    const res = await axios.put(`${GOWNS_API_URL}`, payload);
     return res.data;
 };
 

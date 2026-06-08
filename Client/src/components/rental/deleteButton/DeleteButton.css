@@ -4,16 +4,16 @@
   cursor: pointer;
   padding: 6px 8px;
   border-radius: 6px;
-  color: #e74c3c;
-  font-size: 16px;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  color: var(--delete);
+  font-size: 15px;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .delete-btn:hover {
-  background-color: #fdecea;
+  background-color: var(--delete-bg);
   transform: scale(1.1);
 }
 

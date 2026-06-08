@@ -20,11 +20,12 @@ const Update: React.FC<{ rental: RentalProps }> = ({ rental }) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        e.stopPropagation();
+        setIsOpen(false);
         dispatch(updateRentalThunk({ ...form, gownId: Number(form.gownId), size: Number(form.size) }) as any).then(() => {
             dispatch(getReturning() as any);
             dispatch(getRenting() as any);
         });
-        setIsOpen(false);
     };
 
     return (

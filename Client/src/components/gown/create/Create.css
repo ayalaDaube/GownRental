@@ -1,53 +1,76 @@
 .gown-create-container {
-    width: 47.5%;
-    margin-bottom: 16px;
+    margin-bottom: 0;
 }
 
 .gown-create-toggle-btn {
-    background: #fff;
-    border: 1px dashed #aaa;
-    border-radius: 8px;
-    padding: 10px 20px;
-    width: 100%;
-    font-size: 14px;
-    color: #555;
+    background: var(--white);
+    border: 1px solid var(--gold-light);
+    border-radius: 30px;
+    padding: 10px 22px;
+    font-size: 12px;
+    color: var(--gold-dark);
     cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
+    transition: all 0.3s ease;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .gown-create-toggle-btn:hover {
-    border-color: #3498db;
-    color: #3498db;
+    background: linear-gradient(135deg, #fffdf7, #fdf6e3);
+    border-color: var(--gold);
+    box-shadow: 0 2px 12px var(--shadow);
 }
 
 .gown-create-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    backdrop-filter: blur(2px);
 }
 
 .gown-create-form {
-    background: #fff;
-    border: 1px solid #e8e8e8;
-    border-radius: 8px;
-    padding: 28px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    width: 360px;
+    gap: 20px;
+    width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.gown-create-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold-light), var(--gold), var(--gold-light));
 }
 
 .gown-create-title {
     margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 1px solid #e8e8e8;
-    padding-bottom: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+    letter-spacing: 2px;
+    text-align: center;
 }
 
 .gown-create-fields {
@@ -60,53 +83,61 @@
 .gown-create-fields input[type="number"],
 .gown-create-fields input:not([type]) {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
     font-size: 13px;
-    color: #333;
+    color: var(--text-dark);
     outline: none;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
+    transition: all 0.2s;
+    background: var(--cream);
+    font-family: 'Montserrat', sans-serif;
 }
 
 .gown-create-fields input[type="text"]:focus,
 .gown-create-fields input[type="number"]:focus,
 .gown-create-fields input:not([type]):focus {
-    border-color: #3498db;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+    background: var(--white);
 }
 
 .gown-create-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .gown-create-submit-btn {
-    padding: 8px 20px;
-    background-color: #3498db;
-    color: #fff;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: var(--white);
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 13px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .gown-create-submit-btn:hover {
-    background-color: #2980b9;
+    box-shadow: 0 4px 15px var(--shadow);
+    transform: translateY(-1px);
 }
 
 .gown-create-cancel-btn {
-    padding: 8px 20px;
+    padding: 10px 24px;
     background: none;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
     font-size: 13px;
-    color: #888;
+    color: var(--text-mid);
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .gown-create-cancel-btn:hover {
-    border-color: #aaa;
+    border-color: var(--gold-light);
+    color: var(--gold-dark);
 }

@@ -14,7 +14,7 @@ const PlaceOrder: React.FC<PlaceOrderProps> = ({ cart, onClose }) => {
     const dispatch = useDispatch();
     const [form, setForm] = useState({
         rentalId: 0,
-        customerId: 0,
+        customerId: '',
         rentalDate: '',
         eventDate: '',
     });
@@ -36,8 +36,7 @@ const PlaceOrder: React.FC<PlaceOrderProps> = ({ cart, onClose }) => {
         <form className="place-order-form" onSubmit={handleSubmit} onClick={e => e.stopPropagation()}>
             <h3 className="place-order-title">Place Order</h3>
             <div className="place-order-fields">
-                <input type="number" name="rentalId" placeholder="Rental ID" onChange={handleChange} required />
-                <input type="number" name="customerId" placeholder="Customer ID" onChange={handleChange} required />
+                <input type="text" name="customerId" placeholder="Customer ID" onChange={handleChange} required />
                 <input type="date" name="rentalDate" placeholder="Rental Date" onChange={handleChange} required />
                 <input type="date" name="eventDate" placeholder="Event Date" onChange={handleChange} required />
             </div>

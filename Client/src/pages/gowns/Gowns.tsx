@@ -42,14 +42,18 @@ function Gowns() {
 
   return (
     <div className="gowns-page">
-      <div className="gowns-search-bar">
-        <input type="text" placeholder="Search by ID" value={searchById} onChange={handleSearchById} />
-        <input placeholder="Search by Size" value={searchBySize} onChange={handleSearchBySize} type="number" />
-      </div>
-      <Create onAdd={handleAdd} />
-      <div className="gowns-date-search">
-        <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
-        <button onClick={() => selectedDate ? dispatch(getAvailableGownsByDate(selectedDate) as any) : dispatch(fetchGroupsGowns() as any)}>Search</button>
+      <h1 className="gowns-page-title">Gowns Collection</h1>
+      <p className="gowns-page-subtitle">✦ Find Your Perfect Gown ✦</p>
+      <div className="gowns-controls">
+        <div className="gowns-search-bar">
+          <input type="text" placeholder="Search by ID or Gown ID" value={searchById} onChange={handleSearchById} />
+          <input placeholder="Search by Size" value={searchBySize} onChange={handleSearchBySize} type="number" />
+        </div>
+        <div className="gowns-date-search">
+          <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+          <button onClick={() => selectedDate ? dispatch(getAvailableGownsByDate(selectedDate) as any) : dispatch(fetchGroupsGowns() as any)}>Check Availability</button>
+        </div>
+        <Create onAdd={handleAdd} />
       </div>
       <div className="gowns-list">
         {filterdGowns.map((gown: any) => (

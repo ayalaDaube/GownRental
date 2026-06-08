@@ -33,13 +33,13 @@ export const deleteGownThunk = createAsyncThunk("gowns/deleteGown", async (id: n
     return id;
 });
 
-export const updateGownThunk = createAsyncThunk("gowns/updateGown", async (gownData: GownModelProps) => {
-    return await updateGownApi(gownData.id, gownData);
+export const updateGownThunk = createAsyncThunk("gowns/updateGown", async (gownData: any) => {
+    return await updateGownApi(gownData);
 });
 
 export const placeOrderThunk = createAsyncThunk("gowns/placeOrder",  async ({ cart, rentalInfo }: { 
     cart: any[], 
-    rentalInfo: { rentalId: number, customerId: number, rentalDate: string, eventDate: string } 
+    rentalInfo: { rentalId: number, customerId: string, rentalDate: string, eventDate: string } 
 }) => {
     console.log(cart);
     for (const item of cart) {
