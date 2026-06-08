@@ -1,0 +1,153 @@
+.gowns-page {
+  min-height: 100vh;
+  background-color: var(--cream);
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.gowns-page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--text-dark);
+  letter-spacing: 2px;
+  margin: 0 0 6px 0;
+  text-align: center;
+}
+
+.gowns-page-subtitle {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.gowns-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+  width: 100%;
+  max-width: 900px;
+  justify-content: center;
+  align-items: center;
+}
+
+.gowns-search-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gowns-search-bar input,
+.gowns-date-search input {
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.2s;
+  background: var(--white);
+  font-family: 'Lato', sans-serif;
+  min-width: 160px;
+}
+
+.gowns-search-bar input:focus,
+.gowns-date-search input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+}
+
+.gowns-date-search {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gowns-date-search button {
+  padding: 10px 20px;
+  background: var(--gold);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.gowns-date-search button:hover {
+  background: var(--gold-dark);
+  box-shadow: 0 3px 12px var(--shadow);
+}
+
+.gowns-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 1400px;
+}
+
+.place-order-btn {
+  margin-top: 36px;
+  padding: 13px 36px;
+  background: var(--gold);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  box-shadow: 0 4px 14px var(--shadow);
+}
+
+.place-order-btn:hover {
+  background: var(--gold-dark);
+  box-shadow: 0 6px 20px var(--shadow);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .gowns-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .gowns-page {
+    padding: 32px 24px;
+  }
+  .gowns-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .gowns-page {
+    padding: 24px 16px;
+  }
+  .gowns-list {
+    grid-template-columns: 1fr;
+  }
+  .gowns-page-title {
+    font-size: 26px;
+  }
+}
