@@ -1,0 +1,83 @@
+.rentals-page {
+  min-height: 100vh;
+  background-color: var(--cream);
+  padding: 40px 24px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.rentals-page::before {
+  content: '✦ Rentals ✦';
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  margin-bottom: 24px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.rentals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 95%;
+}
+
+.rental-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 12px var(--shadow-dark);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.rental-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
+}
+
+.rental-card:hover {
+  box-shadow: 0 6px 20px var(--shadow);
+}
+
+.rental-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rental-field span {
+  font-size: 10px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.rental-field strong {
+  font-size: 14px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.rental-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}

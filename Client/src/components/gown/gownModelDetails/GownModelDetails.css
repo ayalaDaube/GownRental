@@ -1,0 +1,117 @@
+.gown-model-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 20px 20px 20px;
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+}
+
+.gown-detail-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 6px var(--shadow-dark);
+    transition: all 0.2s;
+}
+
+.gown-detail-card:hover {
+    box-shadow: 0 3px 12px var(--shadow);
+}
+
+.gown-detail-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.gown-detail-field span {
+    font-size: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.gown-detail-field strong {
+    font-size: 13px;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.gown-detail-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+.gown-detail-edit-input {
+    width: 72px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-dark);
+    outline: none;
+    transition: all 0.2s;
+    background: var(--cream);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.gown-detail-edit-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.1);
+    background: var(--white);
+}
+
+.gown-detail-checkbox {
+    font-size: 12px;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.gown-cart-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: var(--gold-dark);
+    font-size: 15px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gown-cart-btn:hover {
+    background-color: rgba(201, 168, 76, 0.1);
+    transform: scale(1.1);
+}
+
+.gown-cart-btn--active {
+    color: var(--delete);
+    background-color: var(--delete-bg);
+}
+
+.gown-cart-btn--disabled,
+.gown-cart-btn:disabled {
+    color: var(--text-light);
+    cursor: not-allowed;
+    background: none;
+}
+
+.gown-cart-btn:disabled:hover {
+    transform: none;
+    background: none;
+}
