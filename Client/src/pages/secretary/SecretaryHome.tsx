@@ -62,6 +62,7 @@ function SecretaryHome() {
           <div className="hero-actions">
             <Link to="/rentals" className="button button-primary">Manage Rentals</Link>
             <Link to="/gowns" className="button button-secondary">Gown Inventory</Link>
+            <Link to="/employee/appointments" className="button button-secondary">Appointments</Link>
           </div>
         </div>
 

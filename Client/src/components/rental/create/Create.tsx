@@ -17,6 +17,7 @@ const Create: React.FC = () => {
         size: 0,
     });
 
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -36,8 +37,6 @@ const Create: React.FC = () => {
                 } else {
                     // Success
                     dispatch(getRentals() as any);
-                    dispatch(getReturning() as any);
-                    dispatch(getRenting() as any);
                     setIsOpen(false);
                     setForm({ rentalId: 0, customerId: '', rentalDate: '', eventDate: '', gownId: 0, size: 0 });
                 }

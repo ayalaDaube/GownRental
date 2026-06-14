@@ -16,13 +16,15 @@ namespace Server
 
             // Add services to the container.
             builder.Services.AddDbContext<DataManager>(options =>
-                options.UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\E0583\\Bina\\SecondYear\\ayala-project\\GownRental-project\\Server\\Dal\\database\\DB.mdf;Integrated Security=True"));
+                options.UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\naomi\\Desktop\\GownRental-project\\Server\\Dal\\database\\DB.mdf;Integrated Security=True"));
             builder.Services.AddScoped<IRentals, RentalService>();
             builder.Services.AddScoped<IRentalDetails, RentalDetailsService>();
             builder.Services.AddScoped<IGownModel, GownModelService>();
             builder.Services.AddScoped<IGownDetails, GownDetailsService>();
             builder.Services.AddScoped<IDal, DalManager>();
             builder.Services.AddScoped<IBl, BLManager>();
+            builder.Services.AddScoped<Dal.Api.IAppointment, Dal.Services.AppointmentService>();
+            builder.Services.AddScoped<Dal.Api.ICustomer, Dal.Services.CustomerService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -47,9 +49,9 @@ namespace Server
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseCors("AllowReact");
+
+            app.UseHttpsRedirection();
 
             app.UseAuthorization();
 

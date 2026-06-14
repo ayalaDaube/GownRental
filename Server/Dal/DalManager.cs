@@ -14,12 +14,18 @@ namespace Dal
 
         public IGownModel gownModel { get; }
 
-        public DalManager(IRentals rentals, IRentalDetails rentalDetails, IGownModel gownModel, IGownDetails gownDetail)
+        public IAppointment Appointment { get; }
+
+        public ICustomer Customer { get; }
+
+        public DalManager(IRentals rentals, IRentalDetails rentalDetails, IGownModel gownModel, IGownDetails gownDetail, IAppointment appointment, ICustomer customer)
         {
             Rentals = rentals;
             RentalDetails = rentalDetails;
             this.gownModel = gownModel;
             this.gownDetail = gownDetail;
+            this.Appointment = appointment;
+            this.Customer = customer;
         }
     }
 }

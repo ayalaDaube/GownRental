@@ -11,5 +11,7 @@ namespace Bl.Api
         public IBLRentals BLRentals { get; }
 
         public IBLGowns BLGowns { get; }
+
+        public IBLAppointment? BLAppointment { get; }
     }
 }

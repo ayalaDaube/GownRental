@@ -13,6 +13,8 @@ namespace Dal.Api
         IRentalDetails RentalDetails { get; }
         IGownDetails gownDetail { get; }
         IGownModel gownModel { get; }
+        IAppointment Appointment { get; }
+        ICustomer Customer { get; }
 
     }
 }
