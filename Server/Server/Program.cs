@@ -3,6 +3,7 @@ using Bl.Api;
 using Dal;
 using Dal.Api;
 using Dal.Models;
+using Dal.Seed;
 using Dal.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,9 +16,6 @@ namespace Server
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            // The LocalDB file lives in Server/Dal/database; |DataDirectory| in the connection string resolves to it.
-            AppDomain.CurrentDomain.SetData("DataDirectory",
-                Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "Dal", "database")));
             builder.Services.AddDbContext<DataManager>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IRentals, RentalService>();
@@ -44,6 +42,15 @@ namespace Server
             });
 
             var app = builder.Build();
+
+            // In development the database is created and filled with demo data on startup.
+            if (app.Environment.IsDevelopment())
+            {
+                using var scope = app.Services.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<DataManager>();
+                db.Database.Migrate();
+                DemoDataSeeder.Seed(db, DateOnly.FromDateTime(DateTime.Today));
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
