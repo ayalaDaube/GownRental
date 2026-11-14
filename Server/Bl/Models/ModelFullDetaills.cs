@@ -12,7 +12,7 @@ namespace Bl.Models
         public string Name { get; set; } = string.Empty;
         public string? Color { get; set; }
         public string? Description { get; set; }
-        public byte[]? ImageUrl { get; set; } = null;
+        public string? ImageUrl { get; set; }
         public bool IsAvailable { get; set; }
         public int ModelId { get; set; }
         public double Price { get; set; }

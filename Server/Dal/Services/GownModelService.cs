@@ -23,7 +23,7 @@ namespace Dal.Services
                 existing.Name = gm.Name;
                 existing.Color = gm.Color;
                 existing.Description = gm.Description;
-                existing.Image = gm.Image;
+                existing.ImageUrl = gm.ImageUrl;
             }
             else
             {
@@ -68,7 +68,7 @@ namespace Dal.Services
             old.Description = gm.Description;
             old.Color = gm.Color;
             old.Name = gm.Name;
-            old.Image = gm.Image;
+            old.ImageUrl = gm.ImageUrl;
             this.dataManager.SaveChanges();
         }
     }

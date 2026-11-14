@@ -34,7 +34,7 @@ namespace Bl.Services
                     Name = model.Name,
                     Color = model.Color,
                     Description = model.Description,
-                    Image = model.ImageUrl,
+                    ImageUrl = model.ImageUrl,
                 });
                 gownDetails.createGownDetails(new Dal.Models.ModelDetails
                 {
@@ -71,7 +71,7 @@ namespace Bl.Services
                         Name = g.Name,
                         Color = g.Color,
                         Description = g.Description,
-                        ImageUrl = g.Image,
+                        ImageUrl = g.ImageUrl,
                         Price = d.Price,
                         Size = d.Size,
                         ModelId = g.Id,
@@ -101,7 +101,7 @@ namespace Bl.Services
                         Name = g.Name,
                         Color = g.Color,
                         Description = g.Description,
-                        ImageUrl = g.Image,
+                        ImageUrl = g.ImageUrl,
                         IsAvailable = d.IsAvailable,
                         Price = d.Price,
                         Size = d.Size,
@@ -117,7 +117,7 @@ namespace Bl.Services
                 Name = model.Name,
                 Color = model.Color,
                 Description = model.Description,
-                Image = model.ImageUrl,
+                ImageUrl = model.ImageUrl,
             });
 
             gownDetails.updateGownDetails(new Dal.Models.ModelDetails
@@ -140,6 +140,7 @@ namespace Bl.Services
                 Name = group.First().Name,
                 Color = group.First().Color,
                 Description = group.First().Description,
+                Image = group.First().ImageUrl,
                 Details = group.Select(g => new ModelDetails
                 {
                     GownId = g.Id,       

@@ -7,7 +7,7 @@ public partial class Rental
 {
     public int Id { get; set; }
 
-    public string? CustomerId { get; set; }
+    public string CustomerId { get; set; } = null!;
 
     public DateTime RentalDate { get; set; }
 
