@@ -427,3 +427,15 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+## Secrets and local configuration (never commit)
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+secrets.json
+
+## Local SQL Server LocalDB files (the schema is rebuilt from Server/Dal/database/scripts)
+*.mdf
+*.ldf
