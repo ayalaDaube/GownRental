@@ -48,7 +48,7 @@ Client/            React application (src/pages, src/components, src/redux, src/
 Server/
   Server/          Web API: controllers, Program.cs, configuration
   Bl/              Business logic services and DTOs
-  Dal/             DbContext, entities, data services, database/scripts (SQL)
+  Dal/             DbContext, entities, data services, EF Core migrations, demo data seeder
 ```
 
 ## API overview
@@ -71,9 +71,22 @@ Base URL in development: `https://localhost:7265` (Swagger UI at `/swagger`).
 
 ### Database
 
-The database is a LocalDB file, `Server/Dal/database/DB.mdf`. Database files are not stored in Git. Reproducible setup (EF Core migrations and demo data) is the next roadmap item; until it lands, place a `DB.mdf` in that folder and apply the SQL scripts in `Server/Dal/database/scripts` in order.
+No manual setup is needed. On startup in the Development environment the API creates a LocalDB database named `GownRental`, applies the EF Core migrations and fills it with fictional demo data: gowns in several sizes, customers, rentals due for pick-up and return, and free fitting appointments for the next three weeks. Dates are relative to today, so the demo is always populated. The seeder only adds what is missing, so restarting does not duplicate anything.
 
-The connection string is read from `ConnectionStrings:DefaultConnection` in `Server/Server/appsettings.json`.
+The connection string is read from `ConnectionStrings:DefaultConnection` in `Server/Server/appsettings.json`. To start over, drop the database:
+
+```bash
+cd Server
+dotnet tool restore
+dotnet ef database drop --project Dal --startup-project Server --context Dal.Models.DataManager
+```
+
+Changing the model? Add a migration (the `dotnet-ef` tool is pinned in `Server/.config/dotnet-tools.json`):
+
+```bash
+cd Server
+dotnet ef migrations add <Name> --project Dal --startup-project Server --context Dal.Models.DataManager
+```
 
 ### Run the API
 
@@ -98,7 +111,7 @@ The core flows work end to end. The goal is a polished product, in this order:
 
 - [x] Single repository with the full history of all contributors
 - [x] Connection string moved out of source code
-- [ ] Reproducible database: EF Core migrations and demo data
+- [x] Reproducible database: EF Core migrations and demo data
 - [ ] Real authentication and roles (secretary vs. customer) instead of a client-side password
 - [ ] Bug fixes in deletion, order placement and availability logic
 - [ ] Code cleanup and strict typing in the client
