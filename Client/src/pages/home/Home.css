@@ -68,55 +68,6 @@
   align-items: flex-start;
 }
 
-.password-overlay {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.35);
-  z-index: 9999;
-  padding: 24px;
-}
-
-.password-card {
-  width: min(100%, 320px);
-  background: #ffffff;
-  border: 1px solid rgba(95, 61, 106, 0.16);
-  border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 24px 60px rgba(74, 60, 92, 0.12);
-}
-
-.password-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #5f3d6a;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-.password-input {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(95, 61, 106, 0.18);
-  font-size: 0.95rem;
-  color: #312c3d;
-  margin-bottom: 12px;
-}
-
-.password-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.password-error {
-  margin: 10px 0 0;
-  color: #b23c4a;
-  font-size: 0.9rem;
-}
-
 .button {
   text-decoration: none;
   padding: 14px 24px;

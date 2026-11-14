@@ -1,4 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../redux/Auth/AuthSlice';
+import { AppDispatch, RootState } from '../../store/store';
 import '../home/Home.css';
 
 function SecretaryHome() {
@@ -36,6 +39,8 @@ function SecretaryHome() {
   ];
 
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const username = useSelector((state: RootState) => state.auth.username);
 
   return (
     <main className="home-page">
@@ -44,17 +49,17 @@ function SecretaryHome() {
           type="button"
           className="button button-outline"
           onClick={() => {
-            localStorage.removeItem('isSecretary');
+            dispatch(logout());
             navigate('/');
           }}
         >
-          Exit Secretary
+          Sign out
         </button>
       </div>
       <section className="home-hero">
         <div className="hero-copy">
           <span className="eyebrow">Gown Rental System</span>
-          <h1>Welcome, Professional Secretary</h1>
+          <h1>Welcome{username ? `, ${username}` : ''}</h1>
           <p>
             This dashboard is designed for clarity and efficiency.
             All tools you need to manage gown rentals are available here.
