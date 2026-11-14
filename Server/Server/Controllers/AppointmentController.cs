@@ -2,6 +2,7 @@ using Bl;
 using Bl.Api;
 using Bl.Models;
 using Dal.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -42,6 +43,8 @@ namespace Server.Controllers
         }
 
         // GET api/<AppointmentController>/getAvailableAppointments
+        // Public: visitors see the free slots and book one without signing in.
+        [AllowAnonymous]
         [Route("getAvailableAppointments")]
         [HttpGet]
         public List<AppointmentFullDetaills> GetAvailableAppointments()
@@ -50,6 +53,8 @@ namespace Server.Controllers
         }
 
         // POST api/<AppointmentController>
+        // Public: booking a fitting does not require an account.
+        [AllowAnonymous]
         [HttpPost]
         public void POST([FromBody] AppointmentFullDetaills newAppointment)
         {
