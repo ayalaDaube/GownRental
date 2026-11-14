@@ -14,5 +14,10 @@ namespace Bl.Models
         public int rentalId { get; set; }
         public int size { get; set; }
         public int gownId { get; set; }
+
+        // Used only when the customer is new: they are registered with these details. Never filled in responses.
+        public string? customerName { get; set; }
+        public string? customerPhone { get; set; }
+        public string? customerEmail { get; set; }
     }
 }

@@ -8,10 +8,14 @@ export interface NewRentalInput {
   customerId: string;
   gownId: number;
   eventDate: string;
+  // Only needed when the customer is not registered yet: they are registered with these details.
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
 }
 
 /** What the user can change on an existing rental. */
-export interface RentalChangesInput extends NewRentalInput {
+export interface RentalChangesInput extends Pick<NewRentalInput, 'customerId' | 'gownId' | 'eventDate'> {
   rentalId: number;
 }
 

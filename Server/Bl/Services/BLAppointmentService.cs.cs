@@ -29,6 +29,8 @@ namespace Bl.Services
         {
             if (fullAppointment == null) throw new ArgumentNullException(nameof(fullAppointment));
 
+            var customerId = CustomerRules.NormalizeId(fullAppointment.CustomerId);
+
             try
             {
                 // Find the existing appointment slot that the UI displayed and the user selected.
@@ -40,27 +42,9 @@ namespace Bl.Services
                     throw new InvalidOperationException("Selected appointment slot not found.");
                 }
 
-                // Ensure customer exists; create only if not found
-                var existingCustomer = customer.GetAllCustomers()
-                                        .FirstOrDefault(c => c.Id == fullAppointment.CustomerId);
-
-                if (existingCustomer == null)
-                {
-                    customer.CreateCustomer(new Customer()
-                    {
-                        Id = fullAppointment.CustomerId,
-                        Name = fullAppointment.CustomerName,
-                        Phone = fullAppointment.CustomerPhone,
-                        Email = fullAppointment.CustomerEmail
-                    });
-                }
-                else
-                {
-                    existingCustomer.Name = fullAppointment.CustomerName;
-                    existingCustomer.Phone = fullAppointment.CustomerPhone;
-                    existingCustomer.Email = fullAppointment.CustomerEmail;
-                    customer.UpdateCustomer(existingCustomer);
-                }
+                // Register the customer if new. An existing customer's details are left as they are.
+                new CustomerRegistrar(customer).EnsureExists(
+                    customerId, fullAppointment.CustomerName, fullAppointment.CustomerPhone, fullAppointment.CustomerEmail);
 
                 // Update the selected appointment to assign the customer and mark as not available
                 var updatedAppointment = new Appointment()
@@ -68,7 +52,7 @@ namespace Bl.Services
                     Id = slot.Id,
                     Date = slot.Date,
                     Hour = slot.Hour,
-                    CustomerId = fullAppointment.CustomerId,
+                    CustomerId = customerId,
                     NumberOfPeople = fullAppointment.NumberOfPeople,
                     IsAvailable = false
                 };
@@ -76,7 +60,7 @@ namespace Bl.Services
                 // This will update the existing slot (DAL now saves changes)
                 appointment.CreateAppointment(updatedAppointment);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not Bl.Exceptions.DomainException)
             {
                 throw new InvalidOperationException("Failed to create appointment.", ex);
             }

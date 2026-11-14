@@ -95,7 +95,7 @@ public class RentalTests
     }
 
     [Fact]
-    public async Task An_unknown_gown_or_customer_is_a_404_with_their_id_in_the_message()
+    public async Task An_unknown_gown_is_a_404_and_an_unregistered_customer_is_a_400_with_their_id_in_the_message()
     {
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
@@ -105,7 +105,7 @@ public class RentalTests
 
         Assert.Equal(HttpStatusCode.NotFound, noGown.StatusCode);
         Assert.Contains("9999", await DetailAsync(noGown));
-        Assert.Equal(HttpStatusCode.NotFound, noCustomer.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, noCustomer.StatusCode);
         Assert.Contains("NOBODY", await DetailAsync(noCustomer));
     }
 

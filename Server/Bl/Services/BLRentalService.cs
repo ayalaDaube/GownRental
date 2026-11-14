@@ -12,7 +12,7 @@ namespace Bl.Services
         private readonly IRentals rentals;
         private readonly IRentalDetails rentalDetails;
         private readonly IGownDetails gowns;
-        private readonly ICustomer customers;
+        private readonly CustomerRegistrar registrar;
 
         public BLRentalService(IDal dal)
         {
@@ -20,7 +20,7 @@ namespace Bl.Services
             rentals = dal.Rentals;
             rentalDetails = dal.RentalDetails;
             gowns = dal.gownDetail;
-            customers = dal.Customer;
+            registrar = new CustomerRegistrar(dal.Customer);
         }
 
         private static DateOnly Today => DateOnly.FromDateTime(DateTime.Now);
@@ -43,7 +43,7 @@ namespace Bl.Services
 
                 var created = rentals.createRental(new Rental
                 {
-                    CustomerId = request.customerId.Trim(),
+                    CustomerId = CustomerRules.NormalizeId(request.customerId),
                     EventDate = request.eventDate,
                     RentalDate = DateTime.Now, // the booking time is decided here, not by the caller
                 });
@@ -92,7 +92,7 @@ namespace Bl.Services
                 rentals.updateRental(new Rental
                 {
                     Id = existing.Id,
-                    CustomerId = request.customerId.Trim(),
+                    CustomerId = CustomerRules.NormalizeId(request.customerId),
                     EventDate = request.eventDate,
                     RentalDate = existing.RentalDate,
                 });
@@ -159,11 +159,7 @@ namespace Bl.Services
         /// <summary>Checks the rules shared by creating and updating a rental and returns the gown that is rented.</summary>
         private ModelDetails Validate(RentalFullDetaills request, int? ignoreRentalId, bool requireFutureDate, bool requireActiveGown)
         {
-            var customerId = request.customerId?.Trim();
-            if (string.IsNullOrEmpty(customerId))
-            {
-                throw new InvalidRequestException("A customer id is required.");
-            }
+            var customerId = CustomerRules.NormalizeId(request.customerId);
             if (request.gownId <= 0)
             {
                 throw new InvalidRequestException("A gown id is required.");
@@ -185,11 +181,6 @@ namespace Bl.Services
                 throw new InvalidRequestException($"Gown {gown.GownId} is size {gown.Size}, not size {request.size}.");
             }
 
-            if (!customers.Exists(customerId))
-            {
-                throw new NotFoundException($"Customer {customerId} does not exist.");
-            }
-
             var clash = rentalDetails.GetConflictingEventDate(
                 gown.GownId,
                 request.eventDate.AddDays(-RentalRules.BufferDays),
@@ -201,6 +192,9 @@ namespace Bl.Services
                     $"Gown {gown.GownId} is already rented for an event on {clash:yyyy-MM-dd}. " +
                     $"Events for the same gown must be more than {RentalRules.BufferDays} days apart.");
             }
+
+            // Last, so that nothing is written for a rental that is going to be refused anyway.
+            registrar.EnsureExists(customerId, request.customerName, request.customerPhone, request.customerEmail);
 
             return gown;
         }
