@@ -17,7 +17,7 @@ export interface NewGownInput {
 export interface GownSizeChanges {
     size: number;
     price: number;
-    isAvailable: boolean;
+    isActive: boolean;
 }
 
 /** What can be changed on a model (shared by all of its sizes). */
@@ -54,10 +54,6 @@ export const updateGownSizeApi = async (gownId: number, changes: GownSizeChanges
 export const updateGownModelApi = async (modelId: number, changes: GownModelChanges) => {
     const res = await http.put(`${GOWNS_API_URL}/models/${modelId}`, changes);
     return res.data;
-};
-// Marks a size as not available; still used by the order flow until orders are handled on the server.
-export const updateAvailabilityApi = async (gown: { gownId: number; size: number; price: number }) => {
-    return updateGownSizeApi(gown.gownId, { size: gown.size, price: gown.price, isAvailable: false });
 };
 
 export const fetchAvailableGownsByDate = async (date: string) => {

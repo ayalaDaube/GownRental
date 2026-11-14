@@ -41,7 +41,7 @@ public class GownEditingTests
         Assert.Equal(16, created.ModelId);
         Assert.Equal(24, created.Id);
         Assert.Equal("Aurora Gown", created.Name);
-        Assert.True(created.IsAvailable);
+        Assert.True(created.IsActive);
         Assert.EndsWith("/api/Gowns/24", response.Headers.Location!.ToString());
         Assert.NotNull(app.Query(db => db.GownModels.Find(16)));
     }
@@ -155,7 +155,7 @@ public class GownEditingTests
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
 
-        var response = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 37, price = 275, isAvailable = true });
+        var response = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 37, price = 275, isActive = true });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var stored = app.Query(db => db.ModelDetails.Find(1))!;
@@ -171,7 +171,7 @@ public class GownEditingTests
         var client = await app.SignedInClientAsync();
 
         // Gown 1 is size 36 and gown 2 is size 38, both of model 1.
-        var response = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 38, price = 220, isAvailable = true });
+        var response = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 38, price = 220, isActive = true });
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         Assert.Equal(36, app.Query(db => db.ModelDetails.Find(1))!.Size);
@@ -183,7 +183,7 @@ public class GownEditingTests
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
 
-        var response = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 36, price = 999, isAvailable = true });
+        var response = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 36, price = 999, isActive = true });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -194,8 +194,8 @@ public class GownEditingTests
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
 
-        var unknown = await client.PutAsJsonAsync("/api/Gowns/9999", new { size = 38, price = 100, isAvailable = true });
-        var invalid = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 38, price = -1, isAvailable = true });
+        var unknown = await client.PutAsJsonAsync("/api/Gowns/9999", new { size = 38, price = 100, isActive = true });
+        var invalid = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 38, price = -1, isActive = true });
 
         Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);

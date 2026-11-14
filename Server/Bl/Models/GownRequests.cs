@@ -38,7 +38,8 @@ namespace Bl.Models
         [Range(1, 100000)]
         public double Price { get; set; }
 
-        public bool IsAvailable { get; set; } = true;
+        /// <summary>False takes the gown out of the inventory (for example when it is damaged).</summary>
+        public bool IsActive { get; set; } = true;
     }
 
     /// <summary>The editable fields shared by all sizes of a model.</summary>

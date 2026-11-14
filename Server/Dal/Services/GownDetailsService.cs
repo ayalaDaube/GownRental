@@ -63,7 +63,7 @@ namespace Dal.Services
             old.Price = gd.Price;
             old.ModelId = gd.ModelId;
             old.Size = gd.Size;
-            old.IsAvailable = gd.IsAvailable;
+            old.IsActive = gd.IsActive;
             dataManager.SaveChanges();
         }
     }

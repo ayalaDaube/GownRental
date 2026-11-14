@@ -19,7 +19,7 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
 
     const handleEditClick = (detail: ModelDetails) => {
         setEditingId(detail.gownId);
-        setEditForm({ size: detail.size, price: detail.price, isAvailable: detail.isAvailable });
+        setEditForm({ size: detail.size, price: detail.price, isActive: detail.isActive });
     };
 
     const handleDelete = (detail: ModelDetails) => {
@@ -33,7 +33,7 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
             changes: {
                 size: Number(editForm.size),
                 price: Number(editForm.price),
-                isAvailable: editForm.isAvailable ?? true,
+                isActive: editForm.isActive ?? true,
             },
         }) as any);
         dispatch(fetchGroupsGowns() as any);
@@ -68,15 +68,15 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                                 <input type="number" value={editForm.size} onChange={e => setEditForm({...editForm, size: Number(e.target.value)})} placeholder="Size" className="gown-detail-edit-input" />
                                 <input type="number" value={editForm.price} onChange={e => setEditForm({...editForm, price: Number(e.target.value)})} placeholder="Price" className="gown-detail-edit-input" />
                                 <label className="gown-detail-checkbox">
-                                    <input type="checkbox" checked={editForm.isAvailable} onChange={e => setEditForm({...editForm, isAvailable: e.target.checked})} />
-                                    &nbsp;Available
+                                    <input type="checkbox" checked={editForm.isActive} onChange={e => setEditForm({...editForm, isActive: e.target.checked})} />
+                                    &nbsp;In stock
                                 </label>
                             </>
                         ) : (
                             <>
                                 <div className="gown-detail-field"><span>Size</span><strong>{detail.size}</strong></div>
                                 <div className="gown-detail-field"><span>Price</span><strong>{detail.price}₪</strong></div>
-                                <div className="gown-detail-field"><span>Available</span><strong>{detail.isAvailable ? 'Yes' : 'No'}</strong></div>
+                                <div className="gown-detail-field"><span>Status</span><strong>{!detail.isActive ? 'Out of stock' : detail.isAvailable ? 'Available' : 'Rented on that date'}</strong></div>
                             </>
                         )}
                         <div className="gown-detail-actions">
@@ -91,7 +91,7 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                             <button className="gown-delete-btn" onClick={() => handleDelete(detail)}><FaTrashAlt /></button>
                             <button
                                 className={`gown-cart-btn ${inCart ? 'gown-cart-btn--active' : ''} ${!detail.isAvailable ? 'gown-cart-btn--disabled' : ''}`}
-                                title={!detail.isAvailable ? 'Not available' : inCart ? 'Remove from cart' : 'Add to cart'}
+                                title={!detail.isActive ? 'Out of stock' : !detail.isAvailable ? 'Not available on that date' : inCart ? 'Remove from cart' : 'Add to cart'}
                                 onClick={() => dispatch(addToCart({ ...detail, ...gownInfo }))}
                                 disabled={!detail.isAvailable}
                             >

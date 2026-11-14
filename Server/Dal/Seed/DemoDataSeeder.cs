@@ -179,5 +179,5 @@ public static class DemoDataSeeder
         new() { Id = id, Name = name, Color = color, Description = description };
 
     private static ModelDetails Details(int gownId, int modelId, int size, double price) =>
-        new() { GownId = gownId, ModelId = modelId, Size = size, Price = price, IsAvailable = true };
+        new() { GownId = gownId, ModelId = modelId, Size = size, Price = price, IsActive = true };
 }

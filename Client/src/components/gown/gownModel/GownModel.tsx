@@ -9,6 +9,9 @@ export interface ModelDetails {
     size: number;
     modelId: number;
     price: number;
+    /** The gown is in the inventory (not retired or damaged). */
+    isActive: boolean;
+    /** The gown can be rented: in the inventory and, when a date is chosen, not rented around it. */
     isAvailable: boolean;
 }
 

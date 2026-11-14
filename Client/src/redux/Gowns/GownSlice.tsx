@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getApiErrorMessage } from "../../services/apiError";
-import { fetchAllGowns, createGownApi, deleteGownApi, deleteGownModelApi, updateGownSizeApi, updateGownModelApi, fetchAllGroupsGowns, updateAvailabilityApi, fetchAvailableGownsByDate, NewGownInput, GownSizeChanges, GownModelChanges } from "../../services/Gowns/task.service";
+import { fetchAllGowns, createGownApi, deleteGownApi, deleteGownModelApi, updateGownSizeApi, updateGownModelApi, fetchAllGroupsGowns, fetchAvailableGownsByDate, NewGownInput, GownSizeChanges, GownModelChanges } from "../../services/Gowns/task.service";
 import GownModel, { GownModelProps } from "../../components/gown/gownModel/GownModel";
 import { createRentalApi } from "../../services/Rentals/task.service";
 export interface initialStateType {
@@ -91,7 +91,6 @@ export const placeOrderThunk = createAsyncThunk("gowns/placeOrder",  async ({ ca
     console.log(cart);
     for (const item of cart) {
         console.log(item);
-        await updateAvailabilityApi(item);
         const newRental = {
             ...rentalInfo,
             gownId: item.gownId,

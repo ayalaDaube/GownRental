@@ -11,7 +11,6 @@ jest.mock('../../services/Gowns/task.service', () => ({
   deleteGownModelApi: jest.fn(),
   updateGownSizeApi: jest.fn(),
   updateGownModelApi: jest.fn(),
-  updateAvailabilityApi: jest.fn(),
   fetchAvailableGownsByDate: jest.fn(),
 }));
 jest.mock('../../services/Rentals/task.service', () => ({ createRentalApi: jest.fn() }));
@@ -27,7 +26,7 @@ const model = (id: number, sizes: number[]) => ({
   name: `Model ${id}`,
   color: 'Blue',
   description: '',
-  details: sizes.map(gownId => ({ gownId, size: 36, modelId: id, price: 100, isAvailable: true })),
+  details: sizes.map(gownId => ({ gownId, size: 36, modelId: id, price: 100, isActive: true, isAvailable: true })),
 });
 
 const storeWith = (gowns: any[]) => {
@@ -126,8 +125,8 @@ test('editing a size and a model is sent to the server and reported', async () =
   updateModel.mockRejectedValue({ response: { status: 400, data: { errors: { Name: ['The Name field is required.'] } } } });
   const store = storeWith([model(1, [10])]);
 
-  await store.dispatch(updateGownSizeThunk({ gownId: 10, changes: { size: 37, price: 275, isAvailable: true } }) as any);
-  expect(updateSize).toHaveBeenCalledWith(10, { size: 37, price: 275, isAvailable: true });
+  await store.dispatch(updateGownSizeThunk({ gownId: 10, changes: { size: 37, price: 275, isActive: true } }) as any);
+  expect(updateSize).toHaveBeenCalledWith(10, { size: 37, price: 275, isActive: true });
   expect(store.getState().gowns.notice?.type).toBe('success');
 
   await store.dispatch(updateGownModelThunk({ modelId: 1, changes: { name: '', color: 'Red' } }) as any);

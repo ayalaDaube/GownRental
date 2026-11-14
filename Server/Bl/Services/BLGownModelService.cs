@@ -80,7 +80,7 @@ namespace Bl.Services
                     ModelId = modelId,
                     Size = request.Size,
                     Price = request.Price,
-                    IsAvailable = true,
+                    IsActive = true,
                 });
                 return newGownId;
             });
@@ -152,18 +152,22 @@ namespace Bl.Services
                         Price = d.Price,
                         Size = d.Size,
                         ModelId = g.Id,
-                        IsAvailable = d.IsAvailable,
+                        IsActive = d.IsActive,
                     }).ToList();
         }
 
+        /// <summary>
+        /// The gowns grouped by model, with each size marked available or not for an event on the given date.
+        /// A size is unavailable when it is out of the inventory or rented within the buffer days around the date.
+        /// </summary>
         public List<ModelGrouped> markingTheOccupieByDate(DateOnly date)
         {
-            var gownIds = rentals.GetRentedGownsByDate(date);
+            var rentedGownIds = rentals.GetRentedGownsByDate(date).ToHashSet();
             var allGowns = GetModelGroupeds();
-            foreach (var gown in allGowns)
-                foreach (var detail in gown.Details)
-                    if (gownIds.Contains(detail.GownId))
-                        detail.IsAvailable = false;
+            foreach (var size in allGowns.SelectMany(model => model.Details))
+            {
+                size.IsAvailable = size.IsActive && !rentedGownIds.Contains(size.GownId);
+            }
             return allGowns;
         }
 
@@ -179,7 +183,7 @@ namespace Bl.Services
                         Color = g.Color,
                         Description = g.Description,
                         ImageUrl = g.ImageUrl,
-                        IsAvailable = d.IsAvailable,
+                        IsActive = d.IsActive,
                         Price = d.Price,
                         Size = d.Size,
                         ModelId = g.Id,
@@ -207,7 +211,7 @@ namespace Bl.Services
                     ModelId = current.ModelId,
                     Size = request.Size,
                     Price = request.Price,
-                    IsAvailable = request.IsAvailable,
+                    IsActive = request.IsActive,
                 });
             });
 
@@ -250,13 +254,14 @@ namespace Bl.Services
                 Color = group.First().Color,
                 Description = group.First().Description,
                 Image = group.First().ImageUrl,
-                Details = group.Select(g => new ModelDetails
+                Details = group.Select(g => new GownSizeInfo
                 {
-                    GownId = g.Id,       
-                    ModelId = g.ModelId, 
+                    GownId = g.Id,
+                    ModelId = g.ModelId,
                     Size = g.Size,
                     Price = g.Price,
-                    IsAvailable = g.IsAvailable
+                    IsActive = g.IsActive,
+                    IsAvailable = g.IsActive, // without a chosen date, availability is just "in the inventory"
                 }).ToList()
             }).ToList();
 

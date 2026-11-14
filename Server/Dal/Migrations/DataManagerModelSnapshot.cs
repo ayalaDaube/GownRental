@@ -152,7 +152,7 @@ namespace Dal.Migrations
                     b.Property<int>("GownId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsAvailable")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<int>("ModelId")

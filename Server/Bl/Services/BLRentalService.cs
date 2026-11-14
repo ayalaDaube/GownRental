@@ -1,4 +1,5 @@
 ﻿using Bl.Api;
+using Bl.Exceptions;
 using Bl.Models;
 using Dal.Api;
 using Dal.Models;
@@ -216,10 +217,10 @@ namespace Bl.Services
         {
             if (date < DateOnly.FromDateTime(DateTime.Now))
             {
-                throw new ArgumentException("Date cannot be in the past");
+                throw new InvalidRequestException("The date cannot be in the past.");
             }
-            DateOnly daysBefore = date.AddDays(-3);
-            DateOnly daysAfter = date.AddDays(3);
+            DateOnly daysBefore = date.AddDays(-RentalRules.BufferDays);
+            DateOnly daysAfter = date.AddDays(RentalRules.BufferDays);
 
             var rentedGownIds = (from r in rental.GetRentals()
                                  join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId

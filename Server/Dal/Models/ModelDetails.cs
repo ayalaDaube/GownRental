@@ -13,7 +13,8 @@ public partial class ModelDetails
 
     public double Price { get; set; }
   
-    public bool IsAvailable { get; set; } = true;
+    /// <summary>True while the gown is part of the inventory. Whether it is free on a given date is worked out from the rentals.</summary>
+    public bool IsActive { get; set; } = true;
 
     public virtual GownModel Model { get; set; } = null!;
 }

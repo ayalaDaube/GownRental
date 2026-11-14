@@ -13,7 +13,8 @@ namespace Bl.Models
         public string? Color { get; set; }
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
-        public bool IsAvailable { get; set; }
+        /// <summary>True while the gown is part of the inventory.</summary>
+        public bool IsActive { get; set; }
         public int ModelId { get; set; }
         public double Price { get; set; }
         public int Size { get; set; }
