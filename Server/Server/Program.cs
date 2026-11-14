@@ -15,8 +15,11 @@ namespace Server
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            // The LocalDB file lives in Server/Dal/database; |DataDirectory| in the connection string resolves to it.
+            AppDomain.CurrentDomain.SetData("DataDirectory",
+                Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "Dal", "database")));
             builder.Services.AddDbContext<DataManager>(options =>
-                options.UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\naomi\\Desktop\\GownRental-project\\Server\\Dal\\database\\DB.mdf;Integrated Security=True"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IRentals, RentalService>();
             builder.Services.AddScoped<IRentalDetails, RentalDetailsService>();
             builder.Services.AddScoped<IGownModel, GownModelService>();
