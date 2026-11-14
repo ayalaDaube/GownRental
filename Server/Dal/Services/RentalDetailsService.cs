@@ -25,6 +25,22 @@ namespace Dal.Services
         }
 
 
+        public List<RentalDetails> GetByRental(int rentalId)
+        {
+            return this.datamanager.RentalDetails.Where(d => d.RentalId == rentalId).ToList();
+        }
+
+        public DateOnly? GetConflictingEventDate(int gownId, DateOnly rangeStart, DateOnly rangeEnd, int? ignoreRentalId)
+        {
+            return (from d in this.datamanager.RentalDetails
+                    join r in this.datamanager.Rentals on d.RentalId equals r.Id
+                    where d.GownId == gownId
+                          && r.EventDate >= rangeStart && r.EventDate <= rangeEnd
+                          && (ignoreRentalId == null || r.Id != ignoreRentalId)
+                    orderby r.EventDate
+                    select (DateOnly?)r.EventDate).FirstOrDefault();
+        }
+
         public bool ExistsForGown(int gownId)
         {
             return this.datamanager.RentalDetails.Any(d => d.GownId == gownId);

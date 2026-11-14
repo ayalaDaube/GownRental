@@ -1,6 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RentalProps } from "../../pages/rentals/rentalview/Rental";
-import { fetchAllRentals, createRentalApi, deleteRentalApi, updateRentalApi, fetchReturning, fetchRenting } from "../../services/Rentals/task.service";
+import {
+  fetchAllRentals, createRentalApi, deleteRentalApi, updateRentalApi, fetchReturning, fetchRenting,
+  NewRentalInput, RentalChangesInput,
+} from "../../services/Rentals/task.service";
+import { getApiErrorMessage } from "../../services/apiError";
 
 interface initialStateType {
   rentals: RentalProps[];
@@ -8,6 +12,7 @@ interface initialStateType {
   pickups: RentalProps[];
   isLoading: boolean;
   error: string | null;
+  notice: { type: 'error' | 'success'; text: string } | null;
 }
 
 const initialState: initialStateType = {
@@ -16,6 +21,7 @@ const initialState: initialStateType = {
   pickups: [],
   isLoading: true,
   error: null,
+  notice: null,
 };
 
 export const getRentals = createAsyncThunk('rentals/getRentals', async () => {
@@ -30,63 +36,69 @@ export const getRenting = createAsyncThunk('rentals/getRenting', async () => {
   return await fetchRenting();
 });
 
-export const addRentalThunk = createAsyncThunk('rentals/addRental', async (rental: RentalProps, { rejectWithValue }) => {
-  try {
-    return await createRentalApi(rental);
-  } catch (error: any) {
-    return rejectWithValue(error?.error || 'Failed to add rental');
+export const addRentalThunk = createAsyncThunk<RentalProps, NewRentalInput, { rejectValue: string }>(
+  'rentals/addRental',
+  async (rental, { rejectWithValue }) => {
+    try {
+      return await createRentalApi(rental);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Could not add the rental.'));
+    }
   }
-});
+);
 
-export const deleteRentalThunk = createAsyncThunk('rentals/deleteRental', async (rentalId: number) => {
-  await deleteRentalApi(rentalId);
-  return rentalId;
-});
-
-export const updateRentalThunk = createAsyncThunk('rentals/updateRental', async (rental: RentalProps, { rejectWithValue }) => {
-  try {
-    return await updateRentalApi(rental);
-  } catch (error: any) {
-    return rejectWithValue(error?.error || 'Failed to update rental');
+export const deleteRentalThunk = createAsyncThunk<number, number, { rejectValue: string }>(
+  'rentals/deleteRental',
+  async (rentalId, { rejectWithValue }) => {
+    try {
+      await deleteRentalApi(rentalId);
+      return rentalId;
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Could not delete the rental.'));
+    }
   }
-});
+);
+
+export const updateRentalThunk = createAsyncThunk<RentalProps, RentalChangesInput, { rejectValue: string }>(
+  'rentals/updateRental',
+  async (rental, { rejectWithValue }) => {
+    try {
+      return await updateRentalApi(rental);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Could not update the rental.'));
+    }
+  }
+);
 
 const rentalSlice = createSlice({
   name: "rentals",
   initialState,
   reducers: {
-    setRentals: (state, action: { payload: RentalProps[] }) => {
-      state.rentals = action.payload;
-    },
-    deleteRental: (state, action: { payload: number }) => {
-      state.rentals = state.rentals.filter(r => r.rentalId !== action.payload);
-    },
-    updateRental: (state, action: { payload: RentalProps }) => {
-      const index = state.rentals.findIndex(r => r.rentalId === action.payload.rentalId);
-      if (index !== -1) state.rentals[index] = action.payload;
+    dismissNotice: (state) => {
+      state.notice = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getRentals.pending, (state) => { state.isLoading = true; })
-      .addCase(getRentals.fulfilled, (state, action) => { state.isLoading = false; state.rentals = action.payload; })
+      .addCase(getRentals.pending, (state) => {
+        // The spinner is for the first load only; a refresh after an edit keeps the list in place.
+        if (state.rentals.length === 0) state.isLoading = true;
+      })
+      .addCase(getRentals.fulfilled, (state, action) => { state.isLoading = false; state.rentals = action.payload; state.error = null; })
       .addCase(getRentals.rejected, (state) => { state.isLoading = false; state.error = "Failed to load rentals."; })
 
-      .addCase(addRentalThunk.fulfilled, (state, action) => { state.isLoading = false; state.rentals.push(action.payload); state.error = null; })
-      .addCase(addRentalThunk.rejected, (state, action) => { state.error = action.payload as string || "Failed to add rental."; })
+      .addCase(addRentalThunk.fulfilled, (state, action) => { state.rentals.push(action.payload); })
 
       .addCase(deleteRentalThunk.fulfilled, (state, action) => {
         state.rentals = state.rentals.filter(r => r.rentalId !== action.payload);
       })
+      .addCase(deleteRentalThunk.rejected, (state, action) => {
+        state.notice = { type: 'error', text: action.payload ?? 'Could not delete the rental.' };
+      })
 
       .addCase(updateRentalThunk.fulfilled, (state, action) => {
-        const updated = action.meta.arg;
-        const index = state.rentals.findIndex(r => r.rentalId === updated.rentalId);
-        if (index !== -1) state.rentals[index] = updated;
-        state.error = null;
-      })
-      .addCase(updateRentalThunk.rejected, (state, action) => {
-        state.error = action.payload as string || "Failed to update rental.";
+        const index = state.rentals.findIndex(r => r.rentalId === action.payload.rentalId);
+        if (index !== -1) state.rentals[index] = action.payload;
       })
 
       .addCase(getReturning.fulfilled, (state, action) => { state.returns = action.payload; })
@@ -94,5 +106,5 @@ const rentalSlice = createSlice({
   }
 });
 
-export const { setRentals, deleteRental, updateRental } = rentalSlice.actions;
+export const { dismissNotice } = rentalSlice.actions;
 export default rentalSlice.reducer;

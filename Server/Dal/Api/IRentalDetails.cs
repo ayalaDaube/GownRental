@@ -11,7 +11,10 @@ namespace Dal.Api
     {
         List<RentalDetails> GetRentalDetails();
         RentalDetails GetRentalDetailsById(int id);
+        List<RentalDetails> GetByRental(int rentalId);
         bool ExistsForGown(int gownId);
+        /// <summary>The event date of a rental of this gown inside the date range, or null when there is none.</summary>
+        DateOnly? GetConflictingEventDate(int gownId, DateOnly rangeStart, DateOnly rangeEnd, int? ignoreRentalId);
         bool ExistsForAnyGown(IEnumerable<int> gownIds);
         void DeleteRentalDetails(int id);
         void createRentalDetails(RentalDetails rd);

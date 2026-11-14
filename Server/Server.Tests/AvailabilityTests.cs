@@ -71,7 +71,7 @@ public class AvailabilityTests
 
         var rental = await RentAsync(client, gownId: 21, size: 44, EventDay);
 
-        Assert.Equal(HttpStatusCode.OK, rental.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, rental.StatusCode);
         var size = await SizeAsync(client, "/api/Gowns/groups", 21);
         Assert.True(size.IsActive);
         Assert.True(size.IsAvailable);

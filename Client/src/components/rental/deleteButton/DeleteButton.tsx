@@ -12,6 +12,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({ rentalId }) => {
     const dispatch = useDispatch();
     return (
         <button className="delete-btn" title="Delete" onClick={() => {
+            if (!window.confirm(`Delete rental #${rentalId}?`)) return;
             dispatch(deleteRentalThunk(rentalId) as any).then(() => {
                 dispatch(getReturning() as any);
                 dispatch(getRenting() as any);

@@ -1,10 +1,6 @@
-﻿using Bl;
 using Bl.Api;
 using Bl.Models;
-using Dal.Models;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Server.Controllers
 {
@@ -12,91 +8,58 @@ namespace Server.Controllers
     [ApiController]
     public class RentalsController : ControllerBase
     {
-        IBLRentals bl;
+        private readonly IBLRentals bl;
 
-        public RentalsController(IBl  bl)
+        public RentalsController(IBl bl)
         {
-            this.bl = bl.BLRentals; 
+            this.bl = bl.BLRentals;
         }
-        // GET: api/<RentalsController>
+
         [HttpGet]
         public List<RentalFullDetaills> GetAllGownRentals()
         {
             return bl.GetFullRentals();
         }
 
-        // GET api/<RentalsController>/5
-        [HttpGet("{id}")]
-        public RentalFullDetaills GetRental(int id)
+        [HttpGet("{id:int}")]
+        public ActionResult<RentalFullDetaills> GetRental(int id)
         {
-           
             return bl.GetRentalById(id);
         }
 
-        [Route("returning")]
-        [HttpGet]
+        /// <summary>Rentals whose gowns come back to the shop today (events from three days ago).</summary>
+        [HttpGet("returning")]
         public List<RentalFullDetaills> returningCustomers()
         {
             return bl.returningCustomers();
         }
 
-        [Route("renting")]
-        [HttpGet]
+        /// <summary>Rentals whose gowns customers pick up today (events in three days).</summary>
+        [HttpGet("renting")]
         public List<RentalFullDetaills> rentingCustomers()
         {
             return bl.rentingCustomers();
         }
-        // POST api/<RentalsController>
+
+        /// <summary>Rents a gown. Answers 404 for an unknown gown or customer and 409 when the gown is not free.</summary>
         [HttpPost]
-        public IActionResult Post([FromBody] RentalFullDetaills newRental)
+        public ActionResult<RentalFullDetaills> Post([FromBody] RentalFullDetaills newRental)
         {
-            try
-            {
-                bl.CreateRental(newRental);
-                return Ok(new { success = true, message = "Rental created successfully" });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { success = false, error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, error = "An unexpected error occurred", details = ex.Message });
-            }
+            var created = bl.CreateRental(newRental);
+            return CreatedAtAction(nameof(GetRental), new { id = created.rentalId }, created);
         }
 
-        // PUT api/<RentalsController>/5
         [HttpPut]
-        public IActionResult Put([FromBody] RentalFullDetaills updatedRental)
+        public ActionResult<RentalFullDetaills> Put([FromBody] RentalFullDetaills updatedRental)
         {
-            try
-            {
-                bl.UpdateRental(updatedRental);
-                return Ok(new { success = true, message = "Rental updated successfully" });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { success = false, error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, error = "An unexpected error occurred", details = ex.Message });
-            }
+            return bl.UpdateRental(updatedRental);
         }
 
-        // DELETE api/<RentalsController>/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            try
-            {
-                bl.DeleteRental(id);
-                return Ok(new { success = true, message = "Rental deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, error = "Failed to delete rental", details = ex.Message });
-            }
+            bl.DeleteRental(id);
+            return NoContent();
         }
     }
 }

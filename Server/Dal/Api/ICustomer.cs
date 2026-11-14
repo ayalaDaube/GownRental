@@ -10,6 +10,7 @@ namespace Dal.Api
     public interface ICustomer
     {
         List<Customer> GetAllCustomers();
+        bool Exists(string id);
         Customer GetCustomerById(string id);
         void DeleteCustomer(string id);
         void CreateCustomer(Customer c);

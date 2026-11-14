@@ -51,15 +51,9 @@ namespace Dal.Services
 
         }
 
-        public Rental GetRentalById(int id)
+        public Rental? GetRentalById(int id)
         {
-
-            Rental rental = datamanager.Rentals.ToList().Find(x => x.Id == id);
-            if (rental == null)
-            {
-                throw new ArgumentNullException("This rental doesn't exist");
-            }
-            return rental;
+            return datamanager.Rentals.Find(id);
         }
 
         public void updateRental(Rental r)

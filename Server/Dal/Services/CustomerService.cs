@@ -46,6 +46,11 @@ namespace Dal.Services
             }
         }
 
+        public bool Exists(string id)
+        {
+            return this.datamanager.Customers.Any(c => c.Id == id);
+        }
+
         public List<Customer> GetAllCustomers()
         {
             return this.datamanager.Customers.ToList();

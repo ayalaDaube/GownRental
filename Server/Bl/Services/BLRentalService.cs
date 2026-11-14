@@ -1,232 +1,223 @@
-﻿using Bl.Api;
+using Bl.Api;
 using Bl.Exceptions;
 using Bl.Models;
 using Dal.Api;
 using Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bl.Services
 {
     public class BLRentalService : IBLRentals
     {
-        IRentalDetails rentalDetaills;
-        IRentals rental;
-        public BLRentalService(IDal Rental)
+        private readonly IDal dal;
+        private readonly IRentals rentals;
+        private readonly IRentalDetails rentalDetails;
+        private readonly IGownDetails gowns;
+        private readonly ICustomer customers;
+
+        public BLRentalService(IDal dal)
         {
-            rental = Rental.Rentals;
-            rentalDetaills = Rental.RentalDetails;
-        }
-        public void CreateRental(RentalFullDetaills fullRental)
-        {
-            if (fullRental == null)
-            {
-                throw new ArgumentNullException("Rental details cannot be null");
-            }
-            if (string.IsNullOrEmpty(fullRental.customerId))
-            {
-                throw new ArgumentException("Customer ID cannot be null or empty");
-            }
-            if (fullRental.size <= 0 || fullRental.size == null)
-            {
-                throw new ArgumentException("Size is expected, must be greater than zero");
-            }
-            if (fullRental.gownId <= 0 || fullRental.gownId == null)
-            {
-                throw new ArgumentException("Gown ID is expected, must be greater than zero");
-            }
-            if (fullRental.eventDate < DateOnly.FromDateTime(DateTime.Now))
-            {
-                throw new ArgumentException("Event date cannot be in the past");
-            }
-            var newRental = new Rental()
-            {
-                CustomerId = fullRental.customerId,
-                EventDate = fullRental.eventDate,
-                RentalDate = DateTime.Now
-            };
-
-            var createdRental = rental.createRental(newRental);
-
-            var newRentalDetails = new RentalDetails()
-            {
-                RentalId = createdRental.Id,
-                Size = fullRental.size,
-                GownId = fullRental.gownId
-            };
-
-            rentalDetaills.createRentalDetails(newRentalDetails);
+            this.dal = dal;
+            rentals = dal.Rentals;
+            rentalDetails = dal.RentalDetails;
+            gowns = dal.gownDetail;
+            customers = dal.Customer;
         }
 
+        private static DateOnly Today => DateOnly.FromDateTime(DateTime.Now);
+
+        /// <summary>
+        /// Creates a rental of one gown. Everything is checked first and saved together:
+        /// the customer and the gown must exist, the gown must be in the inventory, and the same
+        /// gown must not be rented for another event within the buffer days.
+        /// </summary>
+        public RentalFullDetaills CreateRental(RentalFullDetaills request)
+        {
+            if (request == null)
+            {
+                throw new InvalidRequestException("Rental details are required.");
+            }
+
+            return dal.RunInTransaction(() =>
+            {
+                var gown = Validate(request, ignoreRentalId: null, requireFutureDate: true, requireActiveGown: true);
+
+                var created = rentals.createRental(new Rental
+                {
+                    CustomerId = request.customerId.Trim(),
+                    EventDate = request.eventDate,
+                    RentalDate = DateTime.Now, // the booking time is decided here, not by the caller
+                });
+                rentalDetails.createRentalDetails(new RentalDetails
+                {
+                    RentalId = created.Id,
+                    GownId = gown.GownId,
+                    Size = gown.Size,
+                });
+
+                return GetRentalById(created.Id);
+            });
+        }
 
         public List<RentalFullDetaills> GetFullRentals()
         {
-            if (rental.GetRentals() == null || rentalDetaills.GetRentalDetails() == null)
-            {
-                throw new ArgumentNullException("No rentals or rental details found");
-            }
-            return (from r in rental.GetRentals()
-                    join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId
-                    select new RentalFullDetaills()
-                    {
-                        customerId = r.CustomerId,
-                        rentalDate = r.RentalDate,
-                        eventDate = r.EventDate,
-                        rentalId = rd.RentalId,
-                        size = rd.Size,
-                        gownId = rd.GownId
-                    }).ToList();
+            return BuildRentals().ToList();
         }
 
-        public RentalFullDetaills? GetRentalById(int id)
+        public RentalFullDetaills GetRentalById(int id)
         {
-            if (id < 0 || id == null)
-            {
-                throw new ArgumentException("Rental ID is expected and must be a positive integer");
-            }
-            var rentalById = (from r in rental.GetRentals()
-                              join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId
-                              where r.Id == id
-                              select new RentalFullDetaills()
-                              {
-                                  customerId = r.CustomerId,
-                                  rentalDate = r.RentalDate,
-                                  eventDate = r.EventDate,
-                                  rentalId = rd.RentalId,
-                                  size = rd.Size,
-                                  gownId = rd.GownId
-                              }).FirstOrDefault();
-            if (rentalById == null)
-            {
-                throw new ArgumentNullException("Rental not found for the given ID");
-            }
-            return rentalById;
+            return BuildRentals().FirstOrDefault(r => r.rentalId == id)
+                   ?? throw new NotFoundException($"Rental {id} does not exist.");
         }
 
-        public void UpdateRental(RentalFullDetaills updatedRental)
+        /// <summary>Changes the customer, event date or gown of a rental. The booking time is kept.</summary>
+        public RentalFullDetaills UpdateRental(RentalFullDetaills request)
         {
-            if (updatedRental == null)
+            if (request == null)
             {
-                throw new ArgumentNullException("Rental details cannot be null");
+                throw new InvalidRequestException("Rental details are required.");
             }
-            if (string.IsNullOrEmpty(updatedRental.customerId))
+
+            return dal.RunInTransaction(() =>
             {
-                throw new ArgumentException("Customer ID cannot be null or empty");
-            }
-            if (updatedRental.size <= 0 || updatedRental.size == null)
-            {
-                throw new ArgumentException("Size is expected, must be greater than zero");
-            }
-            if (updatedRental.gownId <= 0 || updatedRental.gownId == null)
-            {
-                throw new ArgumentException("Gown ID is expected, must be greater than zero");
-            }
-            this.rental.updateRental(new Rental()
-            {
-// I added!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                Id = updatedRental.rentalId,
-                CustomerId = updatedRental.customerId,
-                EventDate = updatedRental.eventDate,
-                RentalDate = updatedRental.rentalDate
-            });
-            var existingDetails = rentalDetaills.GetRentalDetails().FirstOrDefault(rd => rd.RentalId == updatedRental.rentalId);
-            if (existingDetails == null)
-                throw new ArgumentNullException("RentalDetails not found for this rental");
-            this.rentalDetaills.updateRentalDetails(new RentalDetails()
-            {
-                Id = existingDetails.Id,
-                RentalId = updatedRental.rentalId,
-                Size = updatedRental.size,
-                GownId = updatedRental.gownId
+                var existing = rentals.GetRentalById(request.rentalId)
+                    ?? throw new NotFoundException($"Rental {request.rentalId} does not exist.");
+                var existingDetails = rentalDetails.GetByRental(existing.Id).FirstOrDefault()
+                    ?? throw new NotFoundException($"Rental {existing.Id} has no gown.");
+
+                var dateChanged = request.eventDate != existing.EventDate;
+                var gownChanged = request.gownId != existingDetails.GownId;
+                var gown = Validate(request, ignoreRentalId: existing.Id,
+                    requireFutureDate: dateChanged, requireActiveGown: gownChanged);
+
+                rentals.updateRental(new Rental
+                {
+                    Id = existing.Id,
+                    CustomerId = request.customerId.Trim(),
+                    EventDate = request.eventDate,
+                    RentalDate = existing.RentalDate,
+                });
+                rentalDetails.updateRentalDetails(new RentalDetails
+                {
+                    Id = existingDetails.Id,
+                    RentalId = existing.Id,
+                    GownId = gown.GownId,
+                    Size = gown.Size,
+                });
+
+                return GetRentalById(existing.Id);
             });
         }
-
-
 
         public void DeleteRental(int id)
         {
-            if (id <= 0)
+            dal.RunInTransaction(() =>
             {
-                throw new ArgumentException("Rental ID is expected and must be a positive integer");
-            }
+                if (rentals.GetRentalById(id) == null)
+                {
+                    throw new NotFoundException($"Rental {id} does not exist.");
+                }
 
-            var oldRentalDetails = rentalDetaills.GetRentalDetails().FirstOrDefault(rd => rd.RentalId == id);
-            if (oldRentalDetails == null)
-            {
-                throw new ArgumentNullException("This rental details doesn't exist for the requested rental ID");
-            }
-
-            this.rentalDetaills.DeleteRentalDetails(oldRentalDetails.Id);
-            this.rental.DeleteRental(id);
+                foreach (var details in rentalDetails.GetByRental(id))
+                {
+                    rentalDetails.DeleteRentalDetails(details.Id);
+                }
+                rentals.DeleteRental(id);
+            });
         }
 
+        /// <summary>Rentals whose event was the buffer days ago: the gowns that come back to the shop.</summary>
         public List<RentalFullDetaills> returningCustomers()
         {
-            DateTime currentDate = DateTime.Now;
-            currentDate = currentDate.AddDays(-3);
-            var rentalNeeded = (from r in rental.GetRentals()
-                                join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId
-                                where r.EventDate.Year == currentDate.Year &&
-                                      r.EventDate.Month == currentDate.Month &&
-                                      r.EventDate.Day == currentDate.Day
-                                select new RentalFullDetaills()
-                                {
-                                    customerId = r.CustomerId,
-                                    rentalDate = r.RentalDate,
-                                    eventDate = r.EventDate,
-                                    rentalId = rd.RentalId,
-                                    size = rd.Size,
-                                    gownId = rd.GownId
-                                }).ToList();
-            if (rentalNeeded == null)
-            {
-                throw new ArgumentNullException("No rentals found for the upcoming event date");
-            }
-            return rentalNeeded;
+            var day = Today.AddDays(-RentalRules.BufferDays);
+            return BuildRentals().Where(r => r.eventDate == day).ToList();
         }
 
+        /// <summary>Rentals whose event is in the buffer days: the gowns that customers pick up now.</summary>
         public List<RentalFullDetaills> rentingCustomers()
         {
-            DateTime currentDate = DateTime.Now;
-            currentDate = currentDate.AddDays(3);
-            var rentalNeeded = (from r in rental.GetRentals()
-                                join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId
-                                where r.EventDate.Year == currentDate.Year &&
-                                      r.EventDate.Month == currentDate.Month &&
-                                      r.EventDate.Day == currentDate.Day
-                                select new RentalFullDetaills()
-                                {
-                                    customerId = r.CustomerId,
-                                    rentalDate = r.RentalDate,
-                                    eventDate = r.EventDate,
-                                    rentalId = rd.RentalId,
-                                    size = rd.Size,
-                                    gownId = rd.GownId
-                                }).ToList();
-            if (rentalNeeded == null)
-            {
-                throw new ArgumentNullException("No rentals found for the recent event date");
-            }
-            return rentalNeeded;
+            var day = Today.AddDays(RentalRules.BufferDays);
+            return BuildRentals().Where(r => r.eventDate == day).ToList();
         }
 
+        /// <summary>The ids of the gowns that are rented within the buffer days around the date.</summary>
         public List<int> GetRentedGownsByDate(DateOnly date)
         {
-            if (date < DateOnly.FromDateTime(DateTime.Now))
+            if (date < Today)
             {
                 throw new InvalidRequestException("The date cannot be in the past.");
             }
-            DateOnly daysBefore = date.AddDays(-RentalRules.BufferDays);
-            DateOnly daysAfter = date.AddDays(RentalRules.BufferDays);
 
-            var rentedGownIds = (from r in rental.GetRentals()
-                                 join rd in rentalDetaills.GetRentalDetails() on r.Id equals rd.RentalId
-                                 where r.EventDate >= daysBefore && r.EventDate <= daysAfter
-                                 select rd.GownId).Distinct().ToList();
-            return rentedGownIds.Select(gid => gid).ToList();
+            var rangeStart = date.AddDays(-RentalRules.BufferDays);
+            var rangeEnd = date.AddDays(RentalRules.BufferDays);
+
+            return (from r in rentals.GetRentals()
+                    join rd in rentalDetails.GetRentalDetails() on r.Id equals rd.RentalId
+                    where r.EventDate >= rangeStart && r.EventDate <= rangeEnd
+                    select rd.GownId).Distinct().ToList();
+        }
+
+        /// <summary>Checks the rules shared by creating and updating a rental and returns the gown that is rented.</summary>
+        private ModelDetails Validate(RentalFullDetaills request, int? ignoreRentalId, bool requireFutureDate, bool requireActiveGown)
+        {
+            var customerId = request.customerId?.Trim();
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new InvalidRequestException("A customer id is required.");
+            }
+            if (request.gownId <= 0)
+            {
+                throw new InvalidRequestException("A gown id is required.");
+            }
+            if (requireFutureDate && request.eventDate < Today)
+            {
+                throw new InvalidRequestException("The event date cannot be in the past.");
+            }
+
+            var gown = gowns.GetGownDetailsById(request.gownId)
+                ?? throw new NotFoundException($"Gown {request.gownId} does not exist.");
+            if (requireActiveGown && !gown.IsActive)
+            {
+                throw new ConflictException($"Gown {gown.GownId} is out of stock.");
+            }
+            // The size is a property of the gown. It may be left out, but it must not contradict the gown.
+            if (request.size != 0 && request.size != gown.Size)
+            {
+                throw new InvalidRequestException($"Gown {gown.GownId} is size {gown.Size}, not size {request.size}.");
+            }
+
+            if (!customers.Exists(customerId))
+            {
+                throw new NotFoundException($"Customer {customerId} does not exist.");
+            }
+
+            var clash = rentalDetails.GetConflictingEventDate(
+                gown.GownId,
+                request.eventDate.AddDays(-RentalRules.BufferDays),
+                request.eventDate.AddDays(RentalRules.BufferDays),
+                ignoreRentalId);
+            if (clash != null)
+            {
+                throw new ConflictException(
+                    $"Gown {gown.GownId} is already rented for an event on {clash:yyyy-MM-dd}. " +
+                    $"Events for the same gown must be more than {RentalRules.BufferDays} days apart.");
+            }
+
+            return gown;
+        }
+
+        private IEnumerable<RentalFullDetaills> BuildRentals()
+        {
+            return from r in rentals.GetRentals()
+                   join rd in rentalDetails.GetRentalDetails() on r.Id equals rd.RentalId
+                   select new RentalFullDetaills
+                   {
+                       customerId = r.CustomerId,
+                       rentalDate = r.RentalDate,
+                       eventDate = r.EventDate,
+                       rentalId = rd.RentalId,
+                       size = rd.Size,
+                       gownId = rd.GownId,
+                   };
         }
     }
 }
