@@ -1,4 +1,5 @@
 ﻿using Bl.Api;
+using Bl.Exceptions;
 using Bl.Models;
 using Dal.Api;
 using Dal.Models;
@@ -16,8 +17,13 @@ namespace Bl.Services
         public IGownModel gownModel { get; }
         public IGownDetails gownDetails { get; }
         public IBLRentals rentals { get; }
+        private readonly IDal dal;
+        private readonly IRentalDetails rentalDetails;
+
         public BLGownModelService(IDal gown)
         {
+            dal = gown;
+            rentalDetails = gown.RentalDetails;
             gownModel = gown.gownModel;
             gownDetails = gown.gownDetail;
             rentals = new BLRentalService(gown);
@@ -50,15 +56,52 @@ namespace Bl.Services
                 throw new ArgumentException("this gown already exist");
             }
             }
-        // the id of the details
-        public void deleteGown(int id)
+        /// <summary>Deletes one size of a gown. The model is removed too once its last size is gone.</summary>
+        public void deleteGown(int gownId)
         {
-            ModelDetails g = gownDetails.GetGownDetailsById(id);
-            if (g != null)
+            dal.RunInTransaction(() =>
             {
-                gownDetails.DeleteGownDetails(id);
-                gownModel.DeleteGownModel(g.ModelId);
-            }
+                var size = gownDetails.GetGownDetailsById(gownId)
+                    ?? throw new NotFoundException($"Gown {gownId} does not exist.");
+
+                if (rentalDetails.ExistsForGown(gownId))
+                {
+                    throw new ConflictException(
+                        $"Gown {gownId} has rental history and cannot be deleted.");
+                }
+
+                gownDetails.DeleteGownDetails(gownId);
+
+                if (!gownDetails.GetByModel(size.ModelId).Any())
+                {
+                    gownModel.DeleteGownModel(size.ModelId);
+                }
+            });
+        }
+
+        /// <summary>Deletes a model together with all of its sizes, unless one of them was ever rented.</summary>
+        public void deleteGownModel(int modelId)
+        {
+            dal.RunInTransaction(() =>
+            {
+                if (gownModel.GetGownModelById(modelId) == null)
+                {
+                    throw new NotFoundException($"Gown model {modelId} does not exist.");
+                }
+
+                var sizes = gownDetails.GetByModel(modelId);
+                if (rentalDetails.ExistsForAnyGown(sizes.Select(s => s.GownId)))
+                {
+                    throw new ConflictException(
+                        $"Gown model {modelId} has sizes with rental history and cannot be deleted.");
+                }
+
+                foreach (var size in sizes)
+                {
+                    gownDetails.DeleteGownDetails(size.GownId);
+                }
+                gownModel.DeleteGownModel(modelId);
+            });
         }
 
         public List<ModelFullDetaills> getFullGowns()

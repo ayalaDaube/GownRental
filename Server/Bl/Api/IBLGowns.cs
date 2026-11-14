@@ -14,6 +14,7 @@ namespace Bl.Api
             ModelFullDetaills getGownById(int id);
             void updateGown(ModelFullDetaills model);
             void deleteGown(int id);
+            void deleteGownModel(int modelId);
         List<ModelGrouped> markingTheOccupieByDate(DateOnly date);
         List<ModelGrouped> GetModelGroupeds();
 

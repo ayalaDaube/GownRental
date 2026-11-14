@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import Spinner from '../../components/rental/spinner/Spinner';
 import Create from '../../components/gown/create/Create';
-import { addGownThunk, fetchGroupsGowns, getAvailableGownsByDate } from '../../redux/Gowns/GownSlice';
+import { addGownThunk, dismissNotice, fetchGroupsGowns, getAvailableGownsByDate } from '../../redux/Gowns/GownSlice';
+import Notice from '../../components/common/Notice';
 import './Gown.css';
 import PlaceOrder from '../../components/gown/placeOrder/PlaceOrder';
 
@@ -12,6 +13,7 @@ function Gowns() {
   const isLoading = useSelector((state: any) => state.gowns.isLoading);
   const error = useSelector((state: any) => state.gowns.error);
   const cart = useSelector((state: any) => state.gowns.Cart);
+  const notice = useSelector((state: any) => state.gowns.notice);
   const dispatch = useDispatch();
   const [searchById, setSearchById] = useState('');
   const [searchBySize, setSearchBySize] = useState('');
@@ -44,6 +46,7 @@ function Gowns() {
     <div className="gowns-page">
       <h1 className="gowns-page-title">Gowns Collection</h1>
       <p className="gowns-page-subtitle">✦ Find Your Perfect Gown ✦</p>
+      {notice && <Notice type={notice.type} text={notice.text} onClose={() => dispatch(dismissNotice())} />}
       <div className="gowns-controls">
         <div className="gowns-search-bar">
           <input type="text" placeholder="Search by ID or Gown ID" value={searchById} onChange={handleSearchById} />

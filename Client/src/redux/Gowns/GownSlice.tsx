@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchAllGowns, createGownApi, deleteGownApi, updateGownApi, fetchAllGroupsGowns, updateAvailabilityApi, fetchAvailableGownsByDate } from "../../services/Gowns/task.service";
+import { getApiErrorMessage } from "../../services/apiError";
+import { fetchAllGowns, createGownApi, deleteGownApi, deleteGownModelApi, updateGownApi, fetchAllGroupsGowns, updateAvailabilityApi, fetchAvailableGownsByDate } from "../../services/Gowns/task.service";
 import GownModel, { GownModelProps } from "../../components/gown/gownModel/GownModel";
 import { createRentalApi } from "../../services/Rentals/task.service";
 export interface initialStateType {
     gowns: GownModelProps[];
     isLoading: boolean;
     error: string | null;
+    notice: { type: 'error' | 'success'; text: string } | null;
     Cart: any[];
 }
 
@@ -13,6 +15,7 @@ const initialState: initialStateType = {
     gowns: [],
     isLoading: false,
     error: null,
+    notice: null,
     Cart: [],
 };
 
@@ -28,10 +31,29 @@ export const addGownThunk = createAsyncThunk("gowns/addGown", async (gownData: G
     return await createGownApi(gownData);
 });
 
-export const deleteGownThunk = createAsyncThunk("gowns/deleteGown", async (id: number) => {
-    await deleteGownApi(id);
-    return id;
-});
+export const deleteGownThunk = createAsyncThunk<number, number, { rejectValue: string }>(
+    "gowns/deleteGown",
+    async (gownId, { rejectWithValue }) => {
+        try {
+            await deleteGownApi(gownId);
+            return gownId;
+        } catch (error) {
+            return rejectWithValue(getApiErrorMessage(error));
+        }
+    }
+);
+
+export const deleteGownModelThunk = createAsyncThunk<number, number, { rejectValue: string }>(
+    "gowns/deleteGownModel",
+    async (modelId, { rejectWithValue }) => {
+        try {
+            await deleteGownModelApi(modelId);
+            return modelId;
+        } catch (error) {
+            return rejectWithValue(getApiErrorMessage(error));
+        }
+    }
+);
 
 export const updateGownThunk = createAsyncThunk("gowns/updateGown", async (gownData: any) => {
     return await updateGownApi(gownData);
@@ -81,6 +103,9 @@ const gownSlice = createSlice({
         deleteGown: (state, action) => {
             state.gowns = state.gowns.filter(gown => gown.id !== action.payload);
         },
+        dismissNotice: (state) => {
+            state.notice = null;
+        },
         addToCart: (state, action) => {
             const item = action.payload;
             const exists = state.Cart.find((c: any) => c.gownId === item.gownId);
@@ -129,7 +154,21 @@ const gownSlice = createSlice({
                 state.error = action.error.message || "Failed to add gown";
             })
             .addCase(deleteGownThunk.fulfilled, (state, action) => {
-                state.gowns = state.gowns.filter(gown => gown.id !== action.payload);
+                // The payload is the id of one size (gown); drop it, and the model too once it has no sizes left.
+                state.gowns.forEach(model => {
+                    model.details = model.details.filter(detail => detail.gownId !== action.payload);
+                });
+                state.gowns = state.gowns.filter(model => model.details.length > 0);
+                state.Cart = state.Cart.filter((item: any) => item.gownId !== action.payload);
+            })
+            .addCase(deleteGownThunk.rejected, (state, action) => {
+                state.notice = { type: 'error', text: action.payload ?? 'Could not delete the gown.' };
+            })
+            .addCase(deleteGownModelThunk.fulfilled, (state, action) => {
+                state.gowns = state.gowns.filter(model => model.id !== action.payload);
+            })
+            .addCase(deleteGownModelThunk.rejected, (state, action) => {
+                state.notice = { type: 'error', text: action.payload ?? 'Could not delete the gown model.' };
             })
             .addCase(updateGownThunk.fulfilled, (state, action) => {
                 const updatedGown = action.payload;
@@ -156,5 +195,5 @@ const gownSlice = createSlice({
     }
 });
 
-export const { addGown, updateGown, deleteGown, addToCart } = gownSlice.actions;
+export const { addGown, updateGown, deleteGown, addToCart, dismissNotice } = gownSlice.actions;
 export default gownSlice.reducer;

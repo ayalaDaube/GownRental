@@ -11,6 +11,8 @@ namespace Dal.Api
     {
         List<RentalDetails> GetRentalDetails();
         RentalDetails GetRentalDetailsById(int id);
+        bool ExistsForGown(int gownId);
+        bool ExistsForAnyGown(IEnumerable<int> gownIds);
         void DeleteRentalDetails(int id);
         void createRentalDetails(RentalDetails rd);
         void updateRentalDetails(RentalDetails rd);

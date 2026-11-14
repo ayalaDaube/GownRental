@@ -29,6 +29,9 @@ export const deleteGownApi = async (id: number) => {
     const res = await http.delete(`${GOWNS_API_URL}/${id}`);
     return res.data;
 };
+export const deleteGownModelApi = async (modelId: number) => {
+    await http.delete(`${GOWNS_API_URL}/models/${modelId}`);
+};
 export const updateGownApi = async (gownData: any) => {
     const res = await http.put(`${GOWNS_API_URL}`, gownData);
     return res.data;

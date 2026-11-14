@@ -25,6 +25,17 @@ namespace Dal.Services
         }
 
 
+        public bool ExistsForGown(int gownId)
+        {
+            return this.datamanager.RentalDetails.Any(d => d.GownId == gownId);
+        }
+
+        public bool ExistsForAnyGown(IEnumerable<int> gownIds)
+        {
+            var ids = gownIds.ToList();
+            return this.datamanager.RentalDetails.Any(d => ids.Contains(d.GownId));
+        }
+
         public void createRentalDetails(RentalDetails rd)
         {
             this.datamanager.RentalDetails.Add(rd);

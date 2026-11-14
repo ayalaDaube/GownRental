@@ -1,6 +1,9 @@
 using Bl.Api;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Bl.Models;
 using Dal.Models;
+using Dal.Seed;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -54,6 +57,33 @@ public class ApiFactory : WebApplicationFactory<Program>
         scope.ServiceProvider.GetRequiredService<IBl>().BLAuth
             .EnsureUser(SecretaryUsername, SecretaryPassword, Roles.Secretary);
         return host;
+    }
+
+    /// <summary>Fills the database with the same fictional demo data the development server uses.</summary>
+    public void SeedDemoData()
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<DataManager>();
+        DemoDataSeeder.Seed(db, DateOnly.FromDateTime(DateTime.Today));
+    }
+
+    /// <summary>Runs code against the database directly, to check what was really stored.</summary>
+    public T Query<T>(Func<DataManager, T> query)
+    {
+        using var scope = Services.CreateScope();
+        return query(scope.ServiceProvider.GetRequiredService<DataManager>());
+    }
+
+    /// <summary>A client that is already signed in as the test secretary.</summary>
+    public async Task<HttpClient> SignedInClientAsync()
+    {
+        var client = CreateClient();
+        var response = await client.PostAsJsonAsync("/api/Auth/login",
+            new { username = SecretaryUsername, password = SecretaryPassword });
+        response.EnsureSuccessStatusCode();
+        var login = await response.Content.ReadFromJsonAsync<Server.Controllers.LoginResponse>();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
+        return client;
     }
 
     protected override void Dispose(bool disposing)

@@ -21,6 +21,11 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
         setEditForm({ size: detail.size, price: detail.price, isAvailable: detail.isAvailable });
     };
 
+    const handleDelete = (detail: ModelDetails) => {
+        if (!window.confirm(`Delete size ${detail.size} (gown #${detail.gownId})?`)) return;
+        dispatch(deleteGownThunk(detail.gownId) as any).then(() => dispatch(fetchGroupsGowns() as any));
+    };
+
     const handleSave = (detail: ModelDetails) => {
         const payload = {
             id: detail.gownId,
@@ -73,7 +78,7 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                             ) : (
                                 <button className="gown-update-btn" onClick={() => handleEditClick(detail)}><FaEdit /></button>
                             )}
-                            <button className="gown-delete-btn" onClick={() => dispatch(deleteGownThunk(detail.gownId) as any).then(() => dispatch(fetchGroupsGowns() as any))}><FaTrashAlt /></button>
+                            <button className="gown-delete-btn" onClick={() => handleDelete(detail)}><FaTrashAlt /></button>
                             <button
                                 className={`gown-cart-btn ${inCart ? 'gown-cart-btn--active' : ''} ${!detail.isAvailable ? 'gown-cart-btn--disabled' : ''}`}
                                 title={!detail.isAvailable ? 'Not available' : inCart ? 'Remove from cart' : 'Add to cart'}

@@ -78,18 +78,20 @@ namespace Server.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        /// <summary>Deletes one size of a gown (and the model when it was the last size).</summary>
+        [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            try
-            {
-                bl.deleteGown(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            bl.deleteGown(id);
+            return NoContent();
+        }
+
+        /// <summary>Deletes a gown model together with all of its sizes.</summary>
+        [HttpDelete("models/{modelId:int}")]
+        public IActionResult DeleteModel(int modelId)
+        {
+            bl.deleteGownModel(modelId);
+            return NoContent();
         }
     }
 }

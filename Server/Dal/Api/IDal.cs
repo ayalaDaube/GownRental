@@ -17,5 +17,8 @@ namespace Dal.Api
         ICustomer Customer { get; }
         IUser User { get; }
 
+        /// <summary>Runs the work as one all-or-nothing database transaction: if it throws, nothing is saved.</summary>
+        void RunInTransaction(Action work);
+
     }
 }

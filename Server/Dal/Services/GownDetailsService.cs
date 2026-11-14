@@ -1,60 +1,56 @@
-﻿using Dal.Api;
+using Dal.Api;
 using Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dal.Services
 {
     public class GownDetailsService : IGownDetails
     {
+        private readonly DataManager dataManager;
 
-        DataManager dataManager;
         public GownDetailsService(DataManager dataManager)
         {
             this.dataManager = dataManager;
         }
+
         public void createGownDetails(ModelDetails gd)
         {
-            var model = this.dataManager.GownModels.Find(gd.ModelId);
+            var model = dataManager.GownModels.Find(gd.ModelId);
             if (model == null)
             {
                 throw new ArgumentException("ModelId does not exist.");
             }
-            this.dataManager.ModelDetails.Add(gd);
-            this.dataManager.SaveChanges();
+            dataManager.ModelDetails.Add(gd);
+            dataManager.SaveChanges();
         }
 
         public void DeleteGownDetails(int id)
         {
-            ModelDetails gown = this.dataManager.ModelDetails.ToList().Find(x => x.GownId == id);
+            var gown = dataManager.ModelDetails.Find(id);
             if (gown != null)
             {
-                this.dataManager.ModelDetails.Remove(gown);
-                this.dataManager.SaveChanges();
+                dataManager.ModelDetails.Remove(gown);
+                dataManager.SaveChanges();
             }
         }
 
         public List<ModelDetails> GetGownDetails()
         {
-            return this.dataManager.ModelDetails.ToList();
+            return dataManager.ModelDetails.ToList();
         }
 
-        public ModelDetails GetGownDetailsById(int id)
+        public ModelDetails? GetGownDetailsById(int id)
         {
-            ModelDetails gown = this.dataManager.ModelDetails.ToList().Find(x => x.GownId == id);
-            if (gown == null)
-            {
-                throw new ArgumentNullException("this detail of the gown model does not exist");
-            }
-            return gown;
+            return dataManager.ModelDetails.Find(id);
+        }
+
+        public List<ModelDetails> GetByModel(int modelId)
+        {
+            return dataManager.ModelDetails.Where(d => d.ModelId == modelId).ToList();
         }
 
         public void updateGownDetails(ModelDetails gd)
         {
-            ModelDetails old = this.dataManager.ModelDetails.ToList().Find(x => x.GownId == gd.GownId);
+            var old = dataManager.ModelDetails.Find(gd.GownId);
             if (old == null)
             {
                 throw new ArgumentNullException("this detail of the gown model does not exist. you can't update it ");
@@ -63,7 +59,7 @@ namespace Dal.Services
             old.ModelId = gd.ModelId;
             old.Size = gd.Size;
             old.IsAvailable = gd.IsAvailable;
-            this.dataManager.SaveChanges();
+            dataManager.SaveChanges();
         }
     }
 }
