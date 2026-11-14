@@ -60,6 +60,20 @@ Base URL in development: `https://localhost:7265` (Swagger UI at `/swagger`).
 | Gowns | `GET /api/Gowns`, `GET /api/Gowns/groups`, `GET /api/Gowns/byDate?date=YYYY-MM-DD`, `GET /api/Gowns/{id}`, `POST`, `PUT`, `DELETE /api/Gowns/{id}` |
 | Rentals | `GET /api/Rentals`, `GET /api/Rentals/{id}`, `GET /api/Rentals/returning`, `GET /api/Rentals/renting`, `POST`, `PUT`, `DELETE /api/Rentals/{id}` |
 | Appointments | `GET /api/Appointment`, `GET /api/Appointment/{id}`, `GET /api/Appointment/getByDate/{date}`, `GET /api/Appointment/getAvailableAppointments`, `POST`, `DELETE /api/Appointment/{id}` |
+| Auth | `POST /api/Auth/login`, `GET /api/Auth/me` |
+
+### Authentication
+
+Staff sign in with a username and password and receive a signed [JWT](https://jwt.io/introduction). The client sends it as `Authorization: Bearer <token>` on every request.
+
+- **Public (no sign-in):** `GET /api/Appointment/getAvailableAppointments` and `POST /api/Appointment`, so visitors can book a fitting, plus `POST /api/Auth/login`.
+- **Everything else requires the `Secretary` role.** The API is secure by default: a new endpoint is protected unless it is explicitly marked `[AllowAnonymous]`.
+- Passwords are stored only as salted hashes (ASP.NET `PasswordHasher`). Login attempts are rate limited per client address.
+- In the Swagger UI, call `POST /api/Auth/login`, then press **Authorize** and paste the token to try protected endpoints.
+
+**Development account.** In the Development environment the API creates one demo secretary on startup. Its username and password are defined under `Seed:Secretary` in `Server/Server/appsettings.Development.json`, together with a development-only signing key under `Jwt:Key`. These values exist for local use only.
+
+**Production.** Never reuse the development values. Provide a random signing key of at least 32 characters outside of source control, for example with an environment variable (`Jwt__Key`) or `dotnet user-secrets`, and set `Cors:AllowedOrigins` to the real client address. The API refuses to start without a valid signing key. Create the first staff account through your own provisioning process, since demo data and the demo account are only created in Development.
 
 ## Getting started
 
@@ -103,7 +117,19 @@ npm ci
 npm start
 ```
 
-The client runs at http://localhost:3000 and calls the API at `https://localhost:7265`. If the browser blocks the API certificate, trust the ASP.NET Core development certificate once with `dotnet dev-certs https --trust`.
+The client runs at http://localhost:3000 and calls the API at `https://localhost:7265`. To use another API address, copy `Client/.env.example` to `Client/.env.local` and change `REACT_APP_API_URL`. If the browser blocks the API certificate, trust the ASP.NET Core development certificate once with `dotnet dev-certs https --trust`.
+
+Staff sign in at http://localhost:3000/login. Visitors can use the home page and appointment booking without an account.
+
+### Run the tests
+
+```bash
+cd Server
+dotnet test            # API integration tests (authentication and authorization)
+
+cd ../Client
+npm test               # client tests (session, sign-in state, protected routes)
+```
 
 ## Status and roadmap
 
@@ -112,7 +138,7 @@ The core flows work end to end. The goal is a polished product, in this order:
 - [x] Single repository with the full history of all contributors
 - [x] Connection string moved out of source code
 - [x] Reproducible database: EF Core migrations and demo data
-- [ ] Real authentication and roles (secretary vs. customer) instead of a client-side password
+- [x] Real authentication (JWT) and role-based authorization instead of a client-side password
 - [ ] Bug fixes in deletion, order placement and availability logic
 - [ ] Code cleanup and strict typing in the client
 - [ ] Automated tests and continuous integration
