@@ -15,6 +15,7 @@ namespace Dal.Api
         IGownModel gownModel { get; }
         IAppointment Appointment { get; }
         ICustomer Customer { get; }
+        IUser User { get; }
 
     }
 }

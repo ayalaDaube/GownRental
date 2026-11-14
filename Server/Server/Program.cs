@@ -26,6 +26,7 @@ namespace Server
             builder.Services.AddScoped<IBl, BLManager>();
             builder.Services.AddScoped<Dal.Api.IAppointment, Dal.Services.AppointmentService>();
             builder.Services.AddScoped<Dal.Api.ICustomer, Dal.Services.CustomerService>();
+            builder.Services.AddScoped<Dal.Api.IUser, Dal.Services.UserService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

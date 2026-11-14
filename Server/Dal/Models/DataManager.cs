@@ -11,6 +11,8 @@ public partial class DataManager : DbContext
     {
     }
 
+    public virtual DbSet<AppUser> AppUsers { get; set; }
+
     public virtual DbSet<Appointment> Appointments { get; set; }
 
     public virtual DbSet<Customer> Customers { get; set; }
@@ -25,6 +27,18 @@ public partial class DataManager : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AppUser>(entity =>
+        {
+            entity.ToTable("AppUser");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Username).HasMaxLength(50);
+            entity.Property(e => e.PasswordHash).HasMaxLength(200);
+            entity.Property(e => e.Role).HasMaxLength(30);
+
+            entity.HasIndex(e => e.Username).IsUnique();
+        });
+
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.ToTable("Customer");

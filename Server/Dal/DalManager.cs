@@ -18,7 +18,9 @@ namespace Dal
 
         public ICustomer Customer { get; }
 
-        public DalManager(IRentals rentals, IRentalDetails rentalDetails, IGownModel gownModel, IGownDetails gownDetail, IAppointment appointment, ICustomer customer)
+        public IUser User { get; }
+
+        public DalManager(IRentals rentals, IRentalDetails rentalDetails, IGownModel gownModel, IGownDetails gownDetail, IAppointment appointment, ICustomer customer, IUser user)
         {
             Rentals = rentals;
             RentalDetails = rentalDetails;
@@ -26,6 +28,7 @@ namespace Dal
             this.gownDetail = gownDetail;
             this.Appointment = appointment;
             this.Customer = customer;
+            this.User = user;
         }
     }
 }
