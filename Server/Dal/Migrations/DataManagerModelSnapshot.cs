@@ -77,6 +77,7 @@ namespace Dal.Migrations
                         .HasColumnType("time(0)");
 
                     b.Property<bool?>("IsAvailable")
+                        .IsConcurrencyToken()
                         .HasColumnType("bit");
 
                     b.Property<int?>("NumberOfPeople")

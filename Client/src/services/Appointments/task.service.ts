@@ -18,8 +18,19 @@ export const fetchAppointmentsByDateApi = async (date: string): Promise<Appointm
     return response.data;
 };
 
-export const bookAppointmentApi = async (appointment: AppointmentType): Promise<void> => {
-    await http.post(APPOINTMENTS_API_URL, appointment);
+/** What a visitor sends to book a slot; name and phone are needed only by a new customer. */
+export interface BookingInput {
+    appointmentDate: string;
+    hour: string;
+    customerId: string;
+    numberOfPeople: number;
+    customerName?: string;
+    customerPhone?: string;
+    customerEmail?: string;
+}
+
+export const bookAppointmentApi = async (booking: BookingInput): Promise<void> => {
+    await http.post(APPOINTMENTS_API_URL, booking);
 };
 
 export const deleteAppointmentApi = async (id: number): Promise<void> => {

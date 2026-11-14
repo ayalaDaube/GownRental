@@ -12,7 +12,7 @@ namespace Bl.Api
 
         public IBLGowns BLGowns { get; }
 
-        public IBLAppointment? BLAppointment { get; }
+        public IBLAppointment BLAppointment { get; }
 
         public IBLAuth BLAuth { get; }
 

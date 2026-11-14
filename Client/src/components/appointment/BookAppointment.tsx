@@ -13,19 +13,36 @@ function BookAppointment({ appointment, onClose }: Props) {
     const dispatch = useDispatch<any>();
     const [form, setForm] = useState({ customerId: '', customerName: '', customerPhone: '', customerEmail: '', numberOfPeople: 1 });
     const [confirmed, setConfirmed] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const booked: AppointmentType = {
-            ...appointment,
-            ...form,
-            numberOfPeople: form.numberOfPeople,
-            isAvailable: false,
-        };
-        dispatch(bookAppointmentThunk(booked)).then(() => {
+        setError(null);
+        setIsSaving(true);
+
+        const result = await dispatch(bookAppointmentThunk({
+            slotId: appointment.id,
+            booking: {
+                appointmentDate: appointment.appointmentDate,
+                hour: appointment.hour,
+                customerId: form.customerId.trim(),
+                customerName: form.customerName.trim() || undefined,
+                customerPhone: form.customerPhone.trim() || undefined,
+                customerEmail: form.customerEmail.trim() || undefined,
+                numberOfPeople: form.numberOfPeople,
+            },
+        }));
+        setIsSaving(false);
+
+        if (bookAppointmentThunk.fulfilled.match(result)) {
             dispatch(fetchAvailableAppointments());
             setConfirmed(true);
-        });
+        } else {
+            // The booking was not made (for example someone else took this time). Say so, and refresh the list.
+            setError(result.payload ?? 'לא ניתן היה לקבוע את התור. נסו שוב.');
+            dispatch(fetchAvailableAppointments());
+        }
     };
 
     if (confirmed) {
@@ -37,10 +54,7 @@ function BookAppointment({ appointment, onClose }: Props) {
                     <div className="success-details">
                         <div className="success-row"><span>תאריך</span><strong>{appointment.appointmentDate}</strong></div>
                         <div className="success-row"><span>שעה</span><strong>{appointment.hour}</strong></div>
-                        <div className="success-row"><span>שם</span><strong>{form.customerName}</strong></div>
                         <div className="success-row"><span>תעודת זהות</span><strong>{form.customerId}</strong></div>
-                        <div className="success-row"><span>טלפון</span><strong>{form.customerPhone}</strong></div>
-                        {form.customerEmail && <div className="success-row"><span>אימייל</span><strong>{form.customerEmail}</strong></div>}
                         <div className="success-row"><span>מספר אנשים</span><strong>{form.numberOfPeople}</strong></div>
                     </div>
                     <button className="apt-book-btn" onClick={onClose}>סגור</button>
@@ -54,14 +68,15 @@ function BookAppointment({ appointment, onClose }: Props) {
             <div className="modal">
                 <h3>הזמנת תור</h3>
                 <p>{appointment.appointmentDate} | {appointment.hour}</p>
+                {error && <div role="alert" style={{ color: '#b3261e', background: '#fdecea', padding: '10px', borderRadius: '8px', marginBottom: '10px', fontSize: '14px' }}>{error}</div>}
                 <form onSubmit={handleSubmit}>
-                    <label>תעודת זהות<input required value={form.customerId} onChange={e => setForm({ ...form, customerId: e.target.value })} /></label>
-                    <label>שם מלא<input required value={form.customerName} onChange={e => setForm({ ...form, customerName: e.target.value })} /></label>
-                    <label>טלפון<input required value={form.customerPhone} onChange={e => setForm({ ...form, customerPhone: e.target.value })} /></label>
-                    <label>אימייל<input value={form.customerEmail} onChange={e => setForm({ ...form, customerEmail: e.target.value })} /></label>
-                    <label>מספר אנשים<input type="number" min={1} value={form.numberOfPeople} onChange={e => setForm({ ...form, numberOfPeople: Number(e.target.value) })} /></label>
+                    <label>תעודת זהות<input required minLength={5} maxLength={9} value={form.customerId} onChange={e => setForm({ ...form, customerId: e.target.value })} /></label>
+                    <label>שם מלא (ללקוח חדש)<input maxLength={60} value={form.customerName} onChange={e => setForm({ ...form, customerName: e.target.value })} /></label>
+                    <label>טלפון (ללקוח חדש)<input type="tel" value={form.customerPhone} onChange={e => setForm({ ...form, customerPhone: e.target.value })} /></label>
+                    <label>אימייל<input type="email" maxLength={100} value={form.customerEmail} onChange={e => setForm({ ...form, customerEmail: e.target.value })} /></label>
+                    <label>מספר אנשים<input type="number" min={1} max={10} value={form.numberOfPeople} onChange={e => setForm({ ...form, numberOfPeople: Number(e.target.value) })} /></label>
                     <div className="modal-actions">
-                        <button type="submit">אשר תור</button>
+                        <button type="submit" disabled={isSaving}>{isSaving ? 'שומר…' : 'אשר תור'}</button>
                         <button type="button" onClick={onClose}>ביטול</button>
                     </div>
                 </form>

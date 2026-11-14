@@ -58,6 +58,10 @@ public partial class DataManager : DbContext
             entity.Property(e => e.CustomerId).HasMaxLength(9).IsUnicode(false);
             entity.Property(e => e.Hour).HasPrecision(0);
 
+            // Booking checks that the slot is still free at the moment it is saved. If someone else booked it
+            // in between, the update affects no row and fails with a concurrency error (answered as 409).
+            entity.Property(e => e.IsAvailable).IsConcurrencyToken();
+
             // A slot is identified by its date and hour; a customer is attached when it is booked.
             entity.HasIndex(e => new { e.Date, e.Hour }).IsUnique();
 

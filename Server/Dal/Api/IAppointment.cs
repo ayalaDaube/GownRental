@@ -11,7 +11,8 @@ namespace Dal.Api
     {
         List<Appointment> GetAllAppointments();
         List<Appointment> GetAppointmentByDate(DateOnly date);
-        Appointment GetAppointmentById(int id);
+        Appointment? GetAppointmentById(int id);
+        Appointment? GetByDateAndHour(DateOnly date, TimeOnly hour);
         void DeleteAppointment(int id);
         void CreateAppointment(Appointment a);
         

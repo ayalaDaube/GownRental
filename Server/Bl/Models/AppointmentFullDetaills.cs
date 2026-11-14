@@ -19,9 +19,10 @@ namespace Bl.Models
         public int? NumberOfPeople { get; set; }
         public bool? IsAvailable { get; set; } = false;
 
-        public string CustomerName { get; set; } = null!;
+        // Needed only when the customer is not registered yet; the server then checks them.
+        public string? CustomerName { get; set; }
 
-        public string CustomerPhone { get; set; } = null!;
+        public string? CustomerPhone { get; set; }
 
         public string? CustomerEmail { get; set; }
 

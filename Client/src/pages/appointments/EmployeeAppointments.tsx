@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllAppointments, deleteAppointmentThunk } from '../../redux/Appointments/AppointmentSlice';
+import { fetchAllAppointments, deleteAppointmentThunk, dismissNotice } from '../../redux/Appointments/AppointmentSlice';
+import Notice from '../../components/common/Notice';
 import { RootState } from '../../store/store';
 import { AppointmentType } from '../../redux/Appointments/AppointmentType';
 import './appointments.css';
 
 function EmployeeAppointments() {
     const dispatch = useDispatch<any>();
-    const { all, isLoading } = useSelector((state: RootState) => state.appointments);
+    const { all, isLoading, notice } = useSelector((state: RootState) => state.appointments);
     const [searchId, setSearchId] = useState('');
 
     useEffect(() => {
         dispatch(fetchAllAppointments());
     }, [dispatch]);
+
+    // A cancelled slot is still listed, now as free, so the list is reloaded after every cancellation.
+    const handleCancel = async (id: number) => {
+        if (!window.confirm('Cancel this appointment?')) return;
+        await dispatch(deleteAppointmentThunk(id));
+        dispatch(fetchAllAppointments());
+    };
 
     const filtered = all.filter(a =>
         searchId === '' || (a.customerId ?? '').includes(searchId)
@@ -30,6 +38,7 @@ function EmployeeAppointments() {
     return (
         <div className="appointments-page">
             <h2>ניהול תורים</h2>
+            {notice && <Notice type={notice.type} text={notice.text} onClose={() => dispatch(dismissNotice())} />}
             <div className="employee-filters">
                 <input
                     placeholder="חיפוש לפי תעודת זהות"
@@ -70,7 +79,7 @@ function EmployeeAppointments() {
                                         </td>
                                         <td>
                                             {!a.isAvailable && (
-                                                <button className="delete-btn" onClick={() => dispatch(deleteAppointmentThunk(a.id))}>בטל</button>
+                                                <button className="delete-btn" onClick={() => handleCancel(a.id)}>בטל</button>
                                             )}
                                         </td>
                                     </tr>

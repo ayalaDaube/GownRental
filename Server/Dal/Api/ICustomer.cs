@@ -11,6 +11,7 @@ namespace Dal.Api
     {
         List<Customer> GetAllCustomers();
         bool Exists(string id);
+        Customer? FindById(string id);
         Customer GetCustomerById(string id);
         void DeleteCustomer(string id);
         void CreateCustomer(Customer c);

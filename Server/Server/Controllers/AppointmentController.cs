@@ -1,73 +1,66 @@
-using Bl;
 using Bl.Api;
 using Bl.Models;
-using Dal.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AppointmentController(IBl bl) : ControllerBase
+    public class AppointmentController : ControllerBase
     {
-#pragma warning disable CS8601 // Possible null reference assignment.
-        IBLAppointment bl = bl.BLAppointment;
-#pragma warning restore CS8601 // Possible null reference assignment.
+        private readonly IBLAppointment bl;
 
-        // GET: api/<AppointmentController>
-        
+        public AppointmentController(IBl bl)
+        {
+            this.bl = bl.BLAppointment;
+        }
+
+        /// <summary>All appointment slots, booked and free, with the customer of each booking (staff only).</summary>
         [HttpGet]
         public List<AppointmentFullDetaills> GetAllAppointments()
         {
             return bl.GetFullAppointments();
         }
 
-        // GET api/<AppointmentController>
-        [HttpGet("{id}")]
-        public AppointmentFullDetaills? GetAppointmentByID(int id)
+        [HttpGet("{id:int}")]
+        public ActionResult<AppointmentFullDetaills> GetAppointmentByID(int id)
         {
-
             return bl.GetAppointmentId(id);
         }
 
-        // GET api/<AppointmentController>
-        [Route("getByDate/{date}")]
-        [HttpGet]
-        public List<AppointmentFullDetaills>? GetAppointmentByDate(DateOnly date)
+        [HttpGet("getByDate/{date}")]
+        public List<AppointmentFullDetaills> GetAppointmentByDate(DateOnly date)
         {
-
             return bl.GetAppointmentDate(date);
         }
 
-        // GET api/<AppointmentController>/getAvailableAppointments
-        // Public: visitors see the free slots and book one without signing in.
+        /// <summary>Public: the free slots that are still in the future, so a visitor can pick one.</summary>
         [AllowAnonymous]
-        [Route("getAvailableAppointments")]
-        [HttpGet]
+        [HttpGet("getAvailableAppointments")]
         public List<AppointmentFullDetaills> GetAvailableAppointments()
         {
             return bl.GetAvailableAppointments();
         }
 
-        // POST api/<AppointmentController>
-        // Public: booking a fitting does not require an account.
+        /// <summary>
+        /// Public: books a free slot. Answers 404 for an unknown slot, 409 when it is already booked
+        /// and 400 for invalid details. The answer holds no customer details.
+        /// </summary>
         [AllowAnonymous]
         [HttpPost]
-        public void POST([FromBody] AppointmentFullDetaills newAppointment)
+        public ActionResult<BookingConfirmation> Post([FromBody] AppointmentFullDetaills newAppointment)
         {
-            bl.Create(newAppointment);
+            var confirmation = bl.Create(newAppointment);
+            return StatusCode(StatusCodes.Status201Created, confirmation);
         }
 
-
-        // PUT api/<GownsController>/5
-        [HttpDelete("{id}")]
-        public void PUT(int id)
+        /// <summary>Cancels a booking (staff only); the slot becomes free again.</summary>
+        [HttpDelete("{id:int}")]
+        public IActionResult Cancel(int id)
         {
             bl.DeleteAppointment(id);
+            return NoContent();
         }
     }
 }
-

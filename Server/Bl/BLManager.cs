@@ -13,7 +13,7 @@ namespace Bl
     {
         public IBLRentals BLRentals { get; }
         public IBLGowns BLGowns { get; }
-        public IBLAppointment? BLAppointment { get; }
+        public IBLAppointment BLAppointment { get; }
         public IBLAuth BLAuth { get; }
         public IBLOrders BLOrders { get; }
 

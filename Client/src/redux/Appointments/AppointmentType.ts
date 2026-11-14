@@ -5,7 +5,8 @@ export interface AppointmentType {
     hour: string;
     numberOfPeople: number | null;
     isAvailable: boolean | null;
-    customerName: string;
-    customerPhone: string;
+    // Shown to staff for booked slots; empty for free slots.
+    customerName?: string;
+    customerPhone?: string;
     customerEmail?: string;
 }

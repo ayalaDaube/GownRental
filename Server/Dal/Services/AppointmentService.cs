@@ -62,14 +62,14 @@ namespace Dal.Services
             return this.datamanager.Appointments.Where(x => x.Date == date).ToList();
         }
 
-        public Appointment GetAppointmentById(int id)
+        public Appointment? GetAppointmentById(int id)
         {
-            Appointment appointment = datamanager.Appointments.ToList().Find(x => x.Id == id);
-            if (appointment == null)
-            {
-                throw new ArgumentNullException("This appointment doesn't exist");
-            }
-            return appointment;
+            return datamanager.Appointments.Find(id);
+        }
+
+        public Appointment? GetByDateAndHour(DateOnly date, TimeOnly hour)
+        {
+            return datamanager.Appointments.FirstOrDefault(x => x.Date == date && x.Hour == hour);
         }
 
   

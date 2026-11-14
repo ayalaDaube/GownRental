@@ -46,6 +46,11 @@ namespace Dal.Services
             }
         }
 
+        public Customer? FindById(string id)
+        {
+            return this.datamanager.Customers.Find(id);
+        }
+
         public bool Exists(string id)
         {
             return this.datamanager.Customers.Any(c => c.Id == id);
