@@ -6,17 +6,17 @@ It was built as a team study project for a client who rents out evening gowns fo
 
 ## Features
 
-**Customers**
-- Browse the gown collection grouped by model, with sizes and prices
-- Check which gowns are free on a chosen event date
-- Add gowns to a cart and place a rental order
+**Visitors (no account needed)**
+- See the shop's home page
 - Book a fitting appointment from the list of free slots
 
-**Secretary**
-- Manage the gown inventory: add, edit and delete gowns and sizes
+**Secretary (signs in)**
+- Manage the gown inventory: add models and sizes, edit them, take a gown out of stock, delete gowns that were never rented
+- Check which gowns are free on a chosen event date
+- Place an order: pick several gowns for one customer and one event date, saved all together or not at all; new customers are registered on the way
 - Create, update and delete rentals
-- See which customers are coming to pick up and which are returning gowns (three days before and after the event)
-- Manage fitting appointments by day and cancel bookings
+- See which gowns are picked up and which come back today (events three days ahead and three days ago)
+- See the appointments by day and cancel bookings
 
 ## Tech stack
 
@@ -57,10 +57,24 @@ Base URL in development: `https://localhost:7265` (Swagger UI at `/swagger`).
 
 | Resource | Endpoints |
 |---|---|
-| Gowns | `GET /api/Gowns`, `GET /api/Gowns/groups`, `GET /api/Gowns/byDate?date=YYYY-MM-DD`, `GET /api/Gowns/{id}`, `POST`, `PUT`, `DELETE /api/Gowns/{id}` |
+| Gowns | `GET /api/Gowns`, `GET /api/Gowns/groups`, `GET /api/Gowns/byDate?date=YYYY-MM-DD`, `GET /api/Gowns/{id}`, `POST /api/Gowns` (new model or new size), `PUT /api/Gowns/{id}` (a size), `PUT /api/Gowns/models/{modelId}`, `DELETE /api/Gowns/{id}`, `DELETE /api/Gowns/models/{modelId}` |
+| Orders | `POST /api/Orders` (several gowns for one customer and event, all or nothing) |
 | Rentals | `GET /api/Rentals`, `GET /api/Rentals/{id}`, `GET /api/Rentals/returning`, `GET /api/Rentals/renting`, `POST`, `PUT`, `DELETE /api/Rentals/{id}` |
-| Appointments | `GET /api/Appointment`, `GET /api/Appointment/{id}`, `GET /api/Appointment/getByDate/{date}`, `GET /api/Appointment/getAvailableAppointments`, `POST`, `DELETE /api/Appointment/{id}` |
+| Appointments | `GET /api/Appointment`, `GET /api/Appointment/{id}`, `GET /api/Appointment/getByDate/{date}`, `GET /api/Appointment/getAvailableAppointments`, `POST`, `DELETE /api/Appointment/{id}` (cancel) |
 | Auth | `POST /api/Auth/login`, `GET /api/Auth/me` |
+
+### Business rules
+
+- **Availability depends on the date.** Renting a gown never retires it. A gown is unavailable for an event when it is rented for another event less than four days away (three days before or after, for delivery and cleaning), or when it was taken out of stock (`isActive = false`).
+- **A rental or an order is all or nothing.** The customer and gown must exist, the gown must be in stock and free on that date, and the event must not be in the past. If anything fails, nothing is saved.
+- **Gowns with rental history cannot be deleted**; a model is deleted automatically when its last size is deleted.
+- **Customers** are identified by an id or passport number of 5 to 9 letters or digits. A new customer needs a name and a phone number; details of an existing customer are never changed by a rental, an order or a public appointment booking.
+- **Appointments** can be booked only while the slot is free and in the future; two people cannot book the same slot, even at the same moment.
+- Ids of gowns and models are assigned by the server.
+
+### Errors
+
+Errors use the standard problem-details JSON (`application/problem+json`) with a `detail` message meant for the user: `400` invalid input, `401` not signed in, `403` wrong role, `404` not found, `409` conflict (for example a gown that is already rented), `429` too many login attempts. Anything unexpected is a generic `500` whose details are only written to the server log.
 
 ### Authentication
 
@@ -125,10 +139,10 @@ Staff sign in at http://localhost:3000/login. Visitors can use the home page and
 
 ```bash
 cd Server
-dotnet test            # API integration tests (authentication and authorization)
+dotnet test            # API integration tests (authentication, gowns, rentals, orders, customers, appointments)
 
 cd ../Client
-npm test               # client tests (session, sign-in state, protected routes)
+npm test               # client tests (session, sign-in state, protected routes, state of gowns, rentals and appointments)
 ```
 
 ## Status and roadmap
@@ -139,7 +153,7 @@ The core flows work end to end. The goal is a polished product, in this order:
 - [x] Connection string moved out of source code
 - [x] Reproducible database: EF Core migrations and demo data
 - [x] Real authentication (JWT) and role-based authorization instead of a client-side password
-- [ ] Bug fixes in deletion, order placement and availability logic
+- [x] Bug fixes in deletion, order placement and availability logic
 - [ ] Code cleanup and strict typing in the client
 - [ ] Automated tests and continuous integration
 - [ ] Right-to-left layout and real gown images
