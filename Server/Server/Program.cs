@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Server.Auth;
+using Server.Errors;
 
 namespace Server
 {
@@ -92,6 +93,10 @@ namespace Server
                         }));
             });
 
+            // Every error leaves the API as the same standard JSON shape (see ApiExceptionHandler).
+            builder.Services.AddProblemDetails();
+            builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -151,6 +156,8 @@ namespace Server
             }
 
             // Configure the HTTP request pipeline.
+            app.UseExceptionHandler();
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
