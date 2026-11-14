@@ -1,25 +1,61 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
+import { useDispatch } from 'react-redux';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import Home from '../pages/home/Home';
+import Login from '../pages/login/Login';
 import Rentals from '../pages/rentals/rentalview/Rentals';
 import RentalsAside from '../pages/rentals/rentalAside/RentalsAside';
 import Gowns from '../pages/gowns/Gowns';
 import SecretaryHome from '../pages/secretary/SecretaryHome';
-import { Route, Routes, Navigate } from 'react-router-dom'; 
 import EmployeeAppointments from '../pages/appointments/EmployeeAppointments';
 import Appointments from '../pages/appointments/appointments';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import { logout } from '../redux/Auth/AuthSlice';
+import { AUTH_EXPIRED_EVENT } from '../services/http';
+import { AppDispatch } from '../store/store';
 
 function App() {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  // The server rejected our token (expired or invalid): sign out and ask the user to sign in again.
+  useEffect(() => {
+    const handleExpired = () => {
+      dispatch(logout());
+      navigate('/login', { replace: true });
+    };
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpired);
+  }, [dispatch, navigate]);
+
   return (
     <div className="app-layout">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/rentals" element={<><main className="app-main"><Rentals /></main><RentalsAside /></>} />
-          <Route path="/gowns" element={<Gowns />} />
-          <Route path="/secretary" element={<SecretaryHome />} />
+      <Routes>
+        {/* Public: visitors can read the home page and book a fitting appointment. */}
+        <Route path="/" element={<Home />} />
         <Route path="/appointments" element={<Appointments />} />
-        <Route path="/employee/appointments" element={<EmployeeAppointments />} />
-        </Routes>
+        <Route path="/login" element={<Login />} />
+
+        {/* Staff only: require signing in. */}
+        <Route path="/secretary" element={<ProtectedRoute><SecretaryHome /></ProtectedRoute>} />
+        <Route path="/gowns" element={<ProtectedRoute><Gowns /></ProtectedRoute>} />
+        <Route
+          path="/rentals"
+          element={
+            <ProtectedRoute>
+              <>
+                <main className="app-main"><Rentals /></main>
+                <RentalsAside />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employee/appointments"
+          element={<ProtectedRoute><EmployeeAppointments /></ProtectedRoute>}
+        />
+      </Routes>
     </div>
   );
 }
