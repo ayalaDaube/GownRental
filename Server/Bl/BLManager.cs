@@ -15,6 +15,7 @@ namespace Bl
         public IBLGowns BLGowns { get; }
         public IBLAppointment? BLAppointment { get; }
         public IBLAuth BLAuth { get; }
+        public IBLOrders BLOrders { get; }
 
 
         public BLManager(IDal dal)
@@ -23,6 +24,7 @@ namespace Bl
             BLGowns = new BLGownModelService(dal);
             BLAppointment = new BLAppointmentService(dal);
             BLAuth = new BLAuthService(dal);
+            BLOrders = new BLOrderService(dal, BLRentals);
         }
     }
 }

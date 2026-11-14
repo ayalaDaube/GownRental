@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import gownReducer, { addGownThunk, deleteGownModelThunk, deleteGownThunk, dismissNotice, updateGownModelThunk, updateGownSizeThunk } from './GownSlice';
+import gownReducer, { addGownThunk, addToCart, deleteGownModelThunk, deleteGownThunk, dismissNotice, placeOrderThunk, updateGownModelThunk, updateGownSizeThunk } from './GownSlice';
+import { placeOrderApi } from '../../services/Orders/task.service';
 import { createGownApi, deleteGownApi, deleteGownModelApi, updateGownModelApi, updateGownSizeApi } from '../../services/Gowns/task.service';
 
 // The services are replaced so no network is used (and axios is not loaded by the test runner).
@@ -13,13 +14,14 @@ jest.mock('../../services/Gowns/task.service', () => ({
   updateGownModelApi: jest.fn(),
   fetchAvailableGownsByDate: jest.fn(),
 }));
-jest.mock('../../services/Rentals/task.service', () => ({ createRentalApi: jest.fn() }));
+jest.mock('../../services/Orders/task.service', () => ({ placeOrderApi: jest.fn() }));
 
 const deleteSize = deleteGownApi as jest.Mock;
 const deleteModel = deleteGownModelApi as jest.Mock;
 const createGown = createGownApi as jest.Mock;
 const updateSize = updateGownSizeApi as jest.Mock;
 const updateModel = updateGownModelApi as jest.Mock;
+const placeOrder = placeOrderApi as jest.Mock;
 
 const model = (id: number, sizes: number[]) => ({
   id,
@@ -131,4 +133,46 @@ test('editing a size and a model is sent to the server and reported', async () =
 
   await store.dispatch(updateGownModelThunk({ modelId: 1, changes: { name: '', color: 'Red' } }) as any);
   expect(store.getState().gowns.notice).toEqual({ type: 'error', text: 'The Name field is required.' });
+});
+
+const cartItem = (gownId: number) => ({ gownId, size: 36, name: 'Gown', modelId: 1, price: 100, isActive: true, isAvailable: true });
+
+test('placing an order sends all the gowns in one request, empties the cart and reports success', async () => {
+  placeOrder.mockResolvedValue({ rentals: [] });
+  const store = storeWith([]);
+  store.dispatch(addToCart(cartItem(21)));
+  store.dispatch(addToCart(cartItem(22)));
+
+  await store.dispatch(placeOrderThunk({ customerId: 'C000001', eventDate: '2026-12-24', gownIds: [21, 22] }) as any);
+
+  expect(placeOrder).toHaveBeenCalledTimes(1);
+  expect(placeOrder).toHaveBeenCalledWith({ customerId: 'C000001', eventDate: '2026-12-24', gownIds: [21, 22] });
+  const state = store.getState().gowns;
+  expect(state.Cart).toEqual([]);
+  expect(state.notice).toEqual({ type: 'success', text: 'The order was placed: 2 gowns for 2026-12-24.' });
+});
+
+test('a refused order keeps the cart so it can be corrected and sent again', async () => {
+  placeOrder.mockRejectedValue({ response: { status: 409, data: { detail: 'Gown 22 is already rented for an event on 2026-12-22.' } } });
+  const store = storeWith([]);
+  store.dispatch(addToCart(cartItem(21)));
+  store.dispatch(addToCart(cartItem(22)));
+
+  const result = await store.dispatch(placeOrderThunk({ customerId: 'C000001', eventDate: '2026-12-24', gownIds: [21, 22] }) as any);
+
+  expect(result.payload).toBe('Gown 22 is already rented for an event on 2026-12-22.');
+  expect(store.getState().gowns.Cart).toHaveLength(2);
+});
+
+test('adding to the cart no longer pops up a browser alert, and adding twice removes the item', () => {
+  const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => undefined);
+  const store = storeWith([]);
+
+  store.dispatch(addToCart(cartItem(21)));
+  expect(store.getState().gowns.Cart).toHaveLength(1);
+  store.dispatch(addToCart(cartItem(21)));
+
+  expect(store.getState().gowns.Cart).toHaveLength(0);
+  expect(alertSpy).not.toHaveBeenCalled();
+  alertSpy.mockRestore();
 });

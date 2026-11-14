@@ -15,5 +15,7 @@ namespace Bl.Api
         public IBLAppointment? BLAppointment { get; }
 
         public IBLAuth BLAuth { get; }
+
+        public IBLOrders BLOrders { get; }
     }
 }

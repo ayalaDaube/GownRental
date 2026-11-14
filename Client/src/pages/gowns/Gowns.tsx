@@ -71,7 +71,14 @@ function Gowns() {
         ))}
       </div>
       <button className="place-order-btn" onClick={() => setIsOrderOpen(true)}>Place Order ({cart?.length || 0})</button>
-      {isOrderOpen && <PlaceOrder cart={cart} onClose={() => setIsOrderOpen(false)} />}
+      {isOrderOpen && (
+        <PlaceOrder
+          cart={cart}
+          defaultEventDate={selectedDate}
+          onClose={() => setIsOrderOpen(false)}
+          onPlaced={() => dispatch((selectedDate ? getAvailableGownsByDate(selectedDate) : fetchGroupsGowns()) as any)}
+        />
+      )}
     </div>
   );
 } 

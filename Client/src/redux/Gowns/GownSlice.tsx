@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getApiErrorMessage } from "../../services/apiError";
 import { fetchAllGowns, createGownApi, deleteGownApi, deleteGownModelApi, updateGownSizeApi, updateGownModelApi, fetchAllGroupsGowns, fetchAvailableGownsByDate, NewGownInput, GownSizeChanges, GownModelChanges } from "../../services/Gowns/task.service";
 import GownModel, { GownModelProps } from "../../components/gown/gownModel/GownModel";
-import { createRentalApi } from "../../services/Rentals/task.service";
+import { placeOrderApi, OrderInput } from "../../services/Orders/task.service";
 export interface initialStateType {
     gowns: GownModelProps[];
     isLoading: boolean;
@@ -84,22 +84,17 @@ export const updateGownModelThunk = createAsyncThunk<unknown, { modelId: number;
     }
 );
 
-export const placeOrderThunk = createAsyncThunk("gowns/placeOrder",  async ({ cart, rentalInfo }: { 
-    cart: any[], 
-    rentalInfo: { rentalId: number, customerId: string, rentalDate: string, eventDate: string } 
-}) => {
-    console.log(cart);
-    for (const item of cart) {
-        console.log(item);
-        const newRental = {
-            ...rentalInfo,
-            gownId: item.gownId,
-            size: item.size,
-        };
-        await createRentalApi(newRental);
+// One request for the whole order: the server rents every gown in it or none of them.
+export const placeOrderThunk = createAsyncThunk<unknown, OrderInput, { rejectValue: string }>(
+    "gowns/placeOrder",
+    async (order, { rejectWithValue }) => {
+        try {
+            return await placeOrderApi(order);
+        } catch (error) {
+            return rejectWithValue(getApiErrorMessage(error, 'Could not place the order.'));
+        }
     }
-    alert("Order Placed Successfully");
-});
+);
 
 export const getAvailableGownsByDate = createAsyncThunk("gowns/getAvailableGownsByDate", async (date: string) => {
     return await fetchAvailableGownsByDate(date);
@@ -118,7 +113,6 @@ const gownSlice = createSlice({
                 state.Cart = state.Cart.filter((c: any) => c.gownId !== item.gownId);
             } else {
                 state.Cart.push(item);
-                alert("Item added to cart");
             }
         }
     }
@@ -185,8 +179,12 @@ const gownSlice = createSlice({
                 state.notice = { type: 'error', text: action.payload ?? 'Could not save the changes.' };
             })
             .addCase(placeOrderThunk.fulfilled, (state, action) => {
+                const { gownIds, eventDate } = action.meta.arg;
                 state.Cart = [];
-                state.isLoading = true;
+                state.notice = {
+                    type: 'success',
+                    text: `The order was placed: ${gownIds.length} ${gownIds.length === 1 ? 'gown' : 'gowns'} for ${eventDate}.`,
+                };
             })
             .addCase(getAvailableGownsByDate.fulfilled, (state, action) => {
                 state.isLoading = false;
