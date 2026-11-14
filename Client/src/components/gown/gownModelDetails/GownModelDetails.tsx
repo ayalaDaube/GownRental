@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './GownModelDetails.css';
 import { ModelDetails } from '../gownModel/GownModel';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, deleteGownThunk, updateGownThunk, fetchGroupsGowns } from '../../../redux/Gowns/GownSlice';
+import { addGownThunk, addToCart, deleteGownThunk, updateGownSizeThunk, fetchGroupsGowns } from '../../../redux/Gowns/GownSlice';
 import { FaShoppingCart, FaTrashAlt, FaEdit } from 'react-icons/fa';
 
 interface GownModelDetailsProps {
@@ -15,6 +15,7 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
     const cart = useSelector((state: any) => state.gowns.Cart);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editForm, setEditForm] = useState<Partial<ModelDetails>>({});
+    const [newSize, setNewSize] = useState({ size: '', price: '' });
 
     const handleEditClick = (detail: ModelDetails) => {
         setEditingId(detail.gownId);
@@ -26,23 +27,32 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
         dispatch(deleteGownThunk(detail.gownId) as any).then(() => dispatch(fetchGroupsGowns() as any));
     };
 
-    const handleSave = (detail: ModelDetails) => {
-        const payload = {
-            id: detail.gownId,
-            name: gownInfo.name,
-            color: gownInfo.color,
-            description: gownInfo.description,
-            imageUrl: gownInfo.image || null,
-            modelId: detail.modelId,
-            size: Number(editForm.size),
-            price: Number(editForm.price),
-            isAvailable: editForm.isAvailable
-        };
-        dispatch(updateGownThunk(payload as any) as any)
-        .then(() => {
+    const handleSave = async (detail: ModelDetails) => {
+        const result = await dispatch(updateGownSizeThunk({
+            gownId: detail.gownId,
+            changes: {
+                size: Number(editForm.size),
+                price: Number(editForm.price),
+                isAvailable: editForm.isAvailable ?? true,
+            },
+        }) as any);
+        dispatch(fetchGroupsGowns() as any);
+        if (updateGownSizeThunk.fulfilled.match(result)) {
+            setEditingId(null);
+        }
+    };
+
+    const handleAddSize = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const result = await dispatch(addGownThunk({
+            modelId: gownInfo.id,
+            size: Number(newSize.size),
+            price: Number(newSize.price),
+        }) as any);
+        if (addGownThunk.fulfilled.match(result)) {
+            setNewSize({ size: '', price: '' });
             dispatch(fetchGroupsGowns() as any);
-        })
-        setEditingId(null);
+        }
     };
 
     return (
@@ -91,6 +101,12 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                     </div>
                 );
             })}
+            <form className="gown-add-size" onSubmit={handleAddSize}>
+                <span className="gown-add-size-label">Add a size</span>
+                <input type="number" value={newSize.size} onChange={e => setNewSize({ ...newSize, size: e.target.value })} placeholder="Size" min={1} max={100} required className="gown-detail-edit-input" />
+                <input type="number" value={newSize.price} onChange={e => setNewSize({ ...newSize, price: e.target.value })} placeholder="Price" min={1} max={100000} step="any" required className="gown-detail-edit-input" />
+                <button type="submit" className="gown-update-submit-btn">Add</button>
+            </form>
         </div>
     );
 }

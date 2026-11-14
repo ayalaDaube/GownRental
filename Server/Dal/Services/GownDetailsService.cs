@@ -43,6 +43,11 @@ namespace Dal.Services
             return dataManager.ModelDetails.Find(id);
         }
 
+        public int GetNextId()
+        {
+            return (dataManager.ModelDetails.Max(d => (int?)d.GownId) ?? 0) + 1;
+        }
+
         public List<ModelDetails> GetByModel(int modelId)
         {
             return dataManager.ModelDetails.Where(d => d.ModelId == modelId).ToList();

@@ -39,6 +39,11 @@ namespace Dal.Services
             }
         }
 
+        public int GetNextId()
+        {
+            return (dataManager.GownModels.Max(m => (int?)m.Id) ?? 0) + 1;
+        }
+
         public GownModel? GetGownModelById(int id)
         {
             return dataManager.GownModels.Find(id);

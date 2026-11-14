@@ -38,16 +38,25 @@ namespace Dal
 
         public void RunInTransaction(Action work)
         {
+            RunInTransaction<object?>(() =>
+            {
+                work();
+                return null;
+            });
+        }
+
+        public T RunInTransaction<T>(Func<T> work)
+        {
             // Already inside a transaction (a nested call): simply take part in it.
             if (dataManager.Database.CurrentTransaction != null)
             {
-                work();
-                return;
+                return work();
             }
 
             using var transaction = dataManager.Database.BeginTransaction();
-            work();
+            var result = work();
             transaction.Commit(); // leaving without Commit (because of an exception) rolls everything back
+            return result;
         }
     }
 }

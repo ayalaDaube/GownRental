@@ -9,10 +9,11 @@ namespace Bl.Api
 {
     public interface IBLGowns
     {
-        void createGown(ModelFullDetaills model);
+        ModelFullDetaills createGown(NewGownRequest request);
             List<ModelFullDetaills> getFullGowns();
             ModelFullDetaills getGownById(int id);
-            void updateGown(ModelFullDetaills model);
+            ModelFullDetaills updateGownSize(int gownId, UpdateSizeRequest request);
+            ModelFullDetaills updateGownModel(int modelId, UpdateModelRequest request);
             void deleteGown(int id);
             void deleteGownModel(int modelId);
         List<ModelGrouped> markingTheOccupieByDate(DateOnly date);

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getApiErrorMessage } from "../../services/apiError";
-import { fetchAllGowns, createGownApi, deleteGownApi, deleteGownModelApi, updateGownApi, fetchAllGroupsGowns, updateAvailabilityApi, fetchAvailableGownsByDate } from "../../services/Gowns/task.service";
+import { fetchAllGowns, createGownApi, deleteGownApi, deleteGownModelApi, updateGownSizeApi, updateGownModelApi, fetchAllGroupsGowns, updateAvailabilityApi, fetchAvailableGownsByDate, NewGownInput, GownSizeChanges, GownModelChanges } from "../../services/Gowns/task.service";
 import GownModel, { GownModelProps } from "../../components/gown/gownModel/GownModel";
 import { createRentalApi } from "../../services/Rentals/task.service";
 export interface initialStateType {
@@ -27,9 +27,16 @@ export const fetchGroupsGowns = createAsyncThunk("gowns/fetchGroupsGowns", async
     return await fetchAllGroupsGowns();
 });
 
-export const addGownThunk = createAsyncThunk("gowns/addGown", async (gownData: GownModelProps) => {
-    return await createGownApi(gownData);
-});
+export const addGownThunk = createAsyncThunk<unknown, NewGownInput, { rejectValue: string }>(
+    "gowns/addGown",
+    async (input, { rejectWithValue }) => {
+        try {
+            return await createGownApi(input);
+        } catch (error) {
+            return rejectWithValue(getApiErrorMessage(error));
+        }
+    }
+);
 
 export const deleteGownThunk = createAsyncThunk<number, number, { rejectValue: string }>(
     "gowns/deleteGown",
@@ -55,9 +62,27 @@ export const deleteGownModelThunk = createAsyncThunk<number, number, { rejectVal
     }
 );
 
-export const updateGownThunk = createAsyncThunk("gowns/updateGown", async (gownData: any) => {
-    return await updateGownApi(gownData);
-});
+export const updateGownSizeThunk = createAsyncThunk<unknown, { gownId: number; changes: GownSizeChanges }, { rejectValue: string }>(
+    "gowns/updateGownSize",
+    async ({ gownId, changes }, { rejectWithValue }) => {
+        try {
+            return await updateGownSizeApi(gownId, changes);
+        } catch (error) {
+            return rejectWithValue(getApiErrorMessage(error));
+        }
+    }
+);
+
+export const updateGownModelThunk = createAsyncThunk<unknown, { modelId: number; changes: GownModelChanges }, { rejectValue: string }>(
+    "gowns/updateGownModel",
+    async ({ modelId, changes }, { rejectWithValue }) => {
+        try {
+            return await updateGownModelApi(modelId, changes);
+        } catch (error) {
+            return rejectWithValue(getApiErrorMessage(error));
+        }
+    }
+);
 
 export const placeOrderThunk = createAsyncThunk("gowns/placeOrder",  async ({ cart, rentalInfo }: { 
     cart: any[], 
@@ -84,25 +109,6 @@ const gownSlice = createSlice({
     name: "gowns",
     initialState: initialState,
     reducers: {
-        addGown: (state, action) => {
-            if (state.gowns.find(gown => gown.id === action.payload.id)) {
-                const model = state.gowns.find(gown => gown.id === action.payload.id);
-                model?.details.push(...action.payload.details);
-            }
-            else {
-                state.gowns.push(action.payload);
-            }
-        },
-        updateGown: (state, action) => {
-            const updatedGown = action.payload;
-            const index = state.gowns.findIndex(gown => gown.id === updatedGown.id);
-            if (index !== -1) {
-                state.gowns[index] = updatedGown;
-            }
-        },
-        deleteGown: (state, action) => {
-            state.gowns = state.gowns.filter(gown => gown.id !== action.payload);
-        },
         dismissNotice: (state) => {
             state.notice = null;
         },
@@ -132,7 +138,10 @@ const gownSlice = createSlice({
                 state.error = action.error.message || "Failed to fetch gowns";
             })
             .addCase(fetchGroupsGowns.pending, (state) => {
-                state.isLoading = true;
+                // Show the spinner only for the first load; a refresh after an edit keeps the list (and open cards) in place.
+                if (state.gowns.length === 0) {
+                    state.isLoading = true;
+                }
             })
             .addCase(fetchGroupsGowns.fulfilled, (state, action) => {
                 state.isLoading = false;
@@ -141,17 +150,11 @@ const gownSlice = createSlice({
             .addCase(fetchGroupsGowns.rejected, (state, action) => {
                 state.error = action.error.message || "Failed to fetch groups gowns";
             })
-            .addCase(addGownThunk.fulfilled, (state, action) => {
-                const newGown = action.meta.arg;
-                const existing = state.gowns.find(gown => gown.id === newGown.id);
-                if (existing) {
-                    existing.details.push(...newGown.details);
-                } else {
-                    state.gowns.push(newGown);
-                }
+            .addCase(addGownThunk.fulfilled, (state) => {
+                state.notice = { type: 'success', text: 'The gown was added.' };
             })
             .addCase(addGownThunk.rejected, (state, action) => {
-                state.error = action.error.message || "Failed to add gown";
+                state.notice = { type: 'error', text: action.payload ?? 'Could not add the gown.' };
             })
             .addCase(deleteGownThunk.fulfilled, (state, action) => {
                 // The payload is the id of one size (gown); drop it, and the model too once it has no sizes left.
@@ -170,12 +173,17 @@ const gownSlice = createSlice({
             .addCase(deleteGownModelThunk.rejected, (state, action) => {
                 state.notice = { type: 'error', text: action.payload ?? 'Could not delete the gown model.' };
             })
-            .addCase(updateGownThunk.fulfilled, (state, action) => {
-                const updatedGown = action.payload;
-                const index = state.gowns.findIndex(gown => gown.id === updatedGown.id);
-                if (index !== -1) {
-                    state.gowns[index] = updatedGown;
-                }
+            .addCase(updateGownSizeThunk.fulfilled, (state) => {
+                state.notice = { type: 'success', text: 'The changes were saved.' };
+            })
+            .addCase(updateGownSizeThunk.rejected, (state, action) => {
+                state.notice = { type: 'error', text: action.payload ?? 'Could not save the changes.' };
+            })
+            .addCase(updateGownModelThunk.fulfilled, (state) => {
+                state.notice = { type: 'success', text: 'The changes were saved.' };
+            })
+            .addCase(updateGownModelThunk.rejected, (state, action) => {
+                state.notice = { type: 'error', text: action.payload ?? 'Could not save the changes.' };
             })
             .addCase(placeOrderThunk.fulfilled, (state, action) => {
                 state.Cart = [];
@@ -195,5 +203,5 @@ const gownSlice = createSlice({
     }
 });
 
-export const { addGown, updateGown, deleteGown, addToCart, dismissNotice } = gownSlice.actions;
+export const { addToCart, dismissNotice } = gownSlice.actions;
 export default gownSlice.reducer;

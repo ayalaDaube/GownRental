@@ -20,5 +20,8 @@ namespace Dal.Api
         /// <summary>Runs the work as one all-or-nothing database transaction: if it throws, nothing is saved.</summary>
         void RunInTransaction(Action work);
 
+        /// <summary>Same, for work that produces a result.</summary>
+        T RunInTransaction<T>(Func<T> work);
+
     }
 }

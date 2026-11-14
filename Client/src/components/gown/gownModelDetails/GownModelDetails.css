@@ -115,3 +115,19 @@
     transform: none;
     background: none;
 }
+
+.gown-add-size {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.gown-add-size-label {
+  font-weight: 600;
+  color: var(--text-mid);
+  font-size: 0.9rem;
+}

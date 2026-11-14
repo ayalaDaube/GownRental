@@ -1,9 +1,10 @@
-import GownModel, { GownModelProps } from '../../components/gown/gownModel/GownModel';
+import GownModel from '../../components/gown/gownModel/GownModel';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import Spinner from '../../components/rental/spinner/Spinner';
 import Create from '../../components/gown/create/Create';
 import { addGownThunk, dismissNotice, fetchGroupsGowns, getAvailableGownsByDate } from '../../redux/Gowns/GownSlice';
+import { NewGownInput } from '../../services/Gowns/task.service';
 import Notice from '../../components/common/Notice';
 import './Gown.css';
 import PlaceOrder from '../../components/gown/placeOrder/PlaceOrder';
@@ -30,8 +31,14 @@ function Gowns() {
   const handleSearchBySize = (event: any) => {
     setSearchBySize(event.target.value);
   }
-  const handleAdd = (gown: GownModelProps) => {
-    dispatch(addGownThunk(gown) as any);
+  // Resolves to true when the gown was saved, so the form knows whether it can close.
+  const handleAdd = async (input: NewGownInput): Promise<boolean> => {
+    const result = await dispatch(addGownThunk(input) as any);
+    if (addGownThunk.fulfilled.match(result)) {
+      dispatch(fetchGroupsGowns() as any);
+      return true;
+    }
+    return false;
   };
 
   useEffect(() => {

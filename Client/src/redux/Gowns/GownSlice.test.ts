@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import gownReducer, { deleteGownModelThunk, deleteGownThunk, dismissNotice } from './GownSlice';
-import { deleteGownApi, deleteGownModelApi } from '../../services/Gowns/task.service';
+import gownReducer, { addGownThunk, deleteGownModelThunk, deleteGownThunk, dismissNotice, updateGownModelThunk, updateGownSizeThunk } from './GownSlice';
+import { createGownApi, deleteGownApi, deleteGownModelApi, updateGownModelApi, updateGownSizeApi } from '../../services/Gowns/task.service';
 
 // The services are replaced so no network is used (and axios is not loaded by the test runner).
 jest.mock('../../services/Gowns/task.service', () => ({
@@ -9,7 +9,8 @@ jest.mock('../../services/Gowns/task.service', () => ({
   createGownApi: jest.fn(),
   deleteGownApi: jest.fn(),
   deleteGownModelApi: jest.fn(),
-  updateGownApi: jest.fn(),
+  updateGownSizeApi: jest.fn(),
+  updateGownModelApi: jest.fn(),
   updateAvailabilityApi: jest.fn(),
   fetchAvailableGownsByDate: jest.fn(),
 }));
@@ -17,6 +18,9 @@ jest.mock('../../services/Rentals/task.service', () => ({ createRentalApi: jest.
 
 const deleteSize = deleteGownApi as jest.Mock;
 const deleteModel = deleteGownModelApi as jest.Mock;
+const createGown = createGownApi as jest.Mock;
+const updateSize = updateGownSizeApi as jest.Mock;
+const updateModel = updateGownModelApi as jest.Mock;
 
 const model = (id: number, sizes: number[]) => ({
   id,
@@ -96,4 +100,36 @@ test('the message can be dismissed', async () => {
   store.dispatch(dismissNotice());
 
   expect(store.getState().gowns.notice).toBeNull();
+});
+
+test('adding a gown sends only what the user typed and reports success', async () => {
+  createGown.mockResolvedValue({ id: 24, modelId: 16 });
+  const store = storeWith([]);
+
+  await store.dispatch(addGownThunk({ name: 'Aurora', color: 'Silver', size: 38, price: 320 }) as any);
+
+  expect(createGown).toHaveBeenCalledWith({ name: 'Aurora', color: 'Silver', size: 38, price: 320 });
+  expect(store.getState().gowns.notice).toEqual({ type: 'success', text: 'The gown was added.' });
+});
+
+test('a refused new gown shows the reason from the server', async () => {
+  createGown.mockRejectedValue({ response: { status: 409, data: { detail: 'Gown model 1 already has size 36.' } } });
+  const store = storeWith([]);
+
+  await store.dispatch(addGownThunk({ modelId: 1, size: 36, price: 250 }) as any);
+
+  expect(store.getState().gowns.notice).toEqual({ type: 'error', text: 'Gown model 1 already has size 36.' });
+});
+
+test('editing a size and a model is sent to the server and reported', async () => {
+  updateSize.mockResolvedValue({});
+  updateModel.mockRejectedValue({ response: { status: 400, data: { errors: { Name: ['The Name field is required.'] } } } });
+  const store = storeWith([model(1, [10])]);
+
+  await store.dispatch(updateGownSizeThunk({ gownId: 10, changes: { size: 37, price: 275, isAvailable: true } }) as any);
+  expect(updateSize).toHaveBeenCalledWith(10, { size: 37, price: 275, isAvailable: true });
+  expect(store.getState().gowns.notice?.type).toBe('success');
+
+  await store.dispatch(updateGownModelThunk({ modelId: 1, changes: { name: '', color: 'Red' } }) as any);
+  expect(store.getState().gowns.notice).toEqual({ type: 'error', text: 'The Name field is required.' });
 });

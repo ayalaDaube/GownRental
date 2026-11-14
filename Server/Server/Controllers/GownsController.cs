@@ -44,38 +44,26 @@ namespace Server.Controllers
             return Ok(res);
         }
 
+        /// <summary>Adds a new gown model with its first size, or a new size to the model given by modelId.</summary>
         [HttpPost]
-        public IActionResult Post([FromBody] ModelFullDetaills newGown)
+        public ActionResult<ModelFullDetaills> Post([FromBody] NewGownRequest request)
         {
-            if (newGown == null) return BadRequest("Body is empty.");
-            try
-            {
-                bl.createGown(newGown);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-            return Ok(" new gown added ");
+            var created = bl.createGown(request);
+            return CreatedAtAction(nameof(GetGownById), new { id = created.Id }, created);
         }
 
-        [HttpPut]
-        public IActionResult Put([FromBody] ModelFullDetaills updatedGown)
+        /// <summary>Changes the size number, price or availability of one size.</summary>
+        [HttpPut("{id:int}")]
+        public ActionResult<ModelFullDetaills> PutSize(int id, [FromBody] UpdateSizeRequest request)
         {
-            if (updatedGown == null) return BadRequest();
-            try
-            {
-                bl.updateGown(updatedGown);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(bl.updateGownSize(id, request));
+        }
+
+        /// <summary>Changes the name, color, description or image of a model (shared by all its sizes).</summary>
+        [HttpPut("models/{modelId:int}")]
+        public ActionResult<ModelFullDetaills> PutModel(int modelId, [FromBody] UpdateModelRequest request)
+        {
+            return Ok(bl.updateGownModel(modelId, request));
         }
 
         /// <summary>Deletes one size of a gown (and the model when it was the last size).</summary>

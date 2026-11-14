@@ -2,33 +2,46 @@ import React, { useState } from 'react';
 import './Update.css';
 import { FaEdit } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
-import { updateGown } from '../../../../src/redux/Gowns/GownSlice';
-import { GownModelProps} from '../../../components/gown/gownModel/GownModel';
+import { fetchGroupsGowns, updateGownModelThunk } from '../../../redux/Gowns/GownSlice';
+import { GownModelProps } from '../../../components/gown/gownModel/GownModel';
+
 const Update: React.FC<{ gown: GownModelProps }> = ({ gown }) => {
     const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState(false);
-    const [updatedGown, setUpdatedGown] = useState(gown);
+    const [isSaving, setIsSaving] = useState(false);
+    const [form, setForm] = useState({
+        name: gown.name,
+        color: gown.color,
+        description: gown.description ?? '',
+        image: gown.image ?? '',
+    });
 
     const handleEditClick = () => {
+        setForm({ name: gown.name, color: gown.color, description: gown.description ?? '', image: gown.image ?? '' });
         setIsEditing(true);
     };
 
-    const handleSaveClick = () => {
-        dispatch(updateGown(updatedGown));
-        setIsEditing(false);
+    const handleSaveClick = async () => {
+        setIsSaving(true);
+        const result = await dispatch(updateGownModelThunk({
+            modelId: gown.id,
+            changes: {
+                name: form.name.trim(),
+                color: form.color.trim(),
+                description: form.description.trim() || undefined,
+                imageUrl: form.image.trim() || null,
+            },
+        }) as any);
+        setIsSaving(false);
+
+        if (updateGownModelThunk.fulfilled.match(result)) {
+            dispatch(fetchGroupsGowns() as any);
+            setIsEditing(false);
+        }
     };
 
-    const handleCancelClick = () => {
-        setUpdatedGown(gown);
-        setIsEditing(false);
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setUpdatedGown(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     return (
@@ -37,23 +50,24 @@ const Update: React.FC<{ gown: GownModelProps }> = ({ gown }) => {
                 <FaEdit />
             </button>
             {isEditing && (
-                <div className="gown-update-overlay" onClick={handleCancelClick}>
+                <div className="gown-update-overlay" onClick={() => setIsEditing(false)}>
                     <form className="gown-update-form" onClick={e => e.stopPropagation()} onSubmit={e => { e.preventDefault(); handleSaveClick(); }}>
                         <h3 className="gown-update-title">Update Gown</h3>
                         <div className="gown-update-fields">
-                            <input type="text" name="name" value={updatedGown.name} onChange={handleChange} placeholder="Name" />
-                            <input type="text" name="color" value={updatedGown.color} onChange={handleChange} placeholder="Color" />
-                            <input type="text" name="description" value={updatedGown.description} onChange={handleChange} placeholder="Description" />
+                            <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Name" maxLength={60} required />
+                            <input type="text" name="color" value={form.color} onChange={handleChange} placeholder="Color" maxLength={30} required />
+                            <input type="text" name="description" value={form.description} onChange={handleChange} placeholder="Description" maxLength={200} />
+                            <input type="url" name="image" value={form.image} onChange={handleChange} placeholder="Image URL (optional)" maxLength={500} />
                         </div>
                         <div className="gown-update-actions">
-                            <button type="submit" className="gown-update-submit-btn">Save</button>
-                            <button type="button" className="gown-update-cancel-btn" onClick={handleCancelClick}>Cancel</button>
+                            <button type="submit" className="gown-update-submit-btn" disabled={isSaving}>{isSaving ? 'Saving…' : 'Save'}</button>
+                            <button type="button" className="gown-update-cancel-btn" onClick={() => setIsEditing(false)}>Cancel</button>
                         </div>
                     </form>
                 </div>
             )}
         </>
-    ); 
+    );
 };
 
 export default Update;

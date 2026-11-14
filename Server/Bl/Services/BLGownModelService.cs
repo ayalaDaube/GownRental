@@ -28,34 +28,68 @@ namespace Bl.Services
             gownDetails = gown.gownDetail;
             rentals = new BLRentalService(gown);
         }
-        public void createGown(ModelFullDetaills model)
+        /// <summary>
+        /// Adds a gown: a new model with its first size, or one more size for an existing model.
+        /// The ids are assigned here, never by the caller.
+        /// </summary>
+        public ModelFullDetaills createGown(NewGownRequest request)
         {
-            var isExisting = gownDetails.GetGownDetails().FirstOrDefault(g => g.GownId == model.Id);
-            if (isExisting == null)
-            {
+            ArgumentNullException.ThrowIfNull(request);
 
-                gownModel.createGownModel(new Dal.Models.GownModel
+            var gownId = dal.RunInTransaction(() =>
+            {
+                int modelId;
+                if (request.ModelId is int existingModelId)
                 {
-                    Id = model.ModelId,
-                    Name = model.Name,
-                    Color = model.Color,
-                    Description = model.Description,
-                    ImageUrl = model.ImageUrl,
-                });
+                    if (gownModel.GetGownModelById(existingModelId) == null)
+                    {
+                        throw new NotFoundException($"Gown model {existingModelId} does not exist.");
+                    }
+                    if (gownDetails.GetByModel(existingModelId).Any(s => s.Size == request.Size))
+                    {
+                        throw new ConflictException($"Gown model {existingModelId} already has size {request.Size}.");
+                    }
+                    modelId = existingModelId;
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(request.Name))
+                    {
+                        throw new InvalidRequestException("A name is required for a new gown model.");
+                    }
+                    if (string.IsNullOrWhiteSpace(request.Color))
+                    {
+                        throw new InvalidRequestException("A color is required for a new gown model.");
+                    }
+
+                    modelId = gownModel.GetNextId();
+                    gownModel.createGownModel(new Dal.Models.GownModel
+                    {
+                        Id = modelId,
+                        Name = request.Name.Trim(),
+                        Color = request.Color.Trim(),
+                        Description = NullIfBlank(request.Description),
+                        ImageUrl = NullIfBlank(request.ImageUrl),
+                    });
+                }
+
+                var newGownId = gownDetails.GetNextId();
                 gownDetails.createGownDetails(new Dal.Models.ModelDetails
                 {
-                    GownId = model.Id,
-                    Price = model.Price,
-                    Size = model.Size,
-                    ModelId = model.ModelId,
-                    IsAvailable = model.IsAvailable,
+                    GownId = newGownId,
+                    ModelId = modelId,
+                    Size = request.Size,
+                    Price = request.Price,
+                    IsAvailable = true,
                 });
-            }
-            else
-            {
-                throw new ArgumentException("this gown already exist");
-            }
-            }
+                return newGownId;
+            });
+
+            return getGownById(gownId)!;
+        }
+
+        private static string? NullIfBlank(string? text) =>
+            string.IsNullOrWhiteSpace(text) ? null : text.Trim();
         /// <summary>Deletes one size of a gown. The model is removed too once its last size is gone.</summary>
         public void deleteGown(int gownId)
         {
@@ -152,25 +186,57 @@ namespace Bl.Services
                     }).FirstOrDefault();
         }
 
-        public void updateGown(ModelFullDetaills model)
+        /// <summary>Changes the size number, price or availability of one size of a gown.</summary>
+        public ModelFullDetaills updateGownSize(int gownId, UpdateSizeRequest request)
         {
-            gownModel.updateGownModel(new Dal.Models.GownModel
+            ArgumentNullException.ThrowIfNull(request);
+
+            dal.RunInTransaction(() =>
             {
-                Id = model.ModelId,
-                Name = model.Name,
-                Color = model.Color,
-                Description = model.Description,
-                ImageUrl = model.ImageUrl,
+                var current = gownDetails.GetGownDetailsById(gownId)
+                    ?? throw new NotFoundException($"Gown {gownId} does not exist.");
+
+                if (gownDetails.GetByModel(current.ModelId).Any(s => s.GownId != gownId && s.Size == request.Size))
+                {
+                    throw new ConflictException($"Gown model {current.ModelId} already has size {request.Size}.");
+                }
+
+                gownDetails.updateGownDetails(new Dal.Models.ModelDetails
+                {
+                    GownId = gownId,
+                    ModelId = current.ModelId,
+                    Size = request.Size,
+                    Price = request.Price,
+                    IsAvailable = request.IsAvailable,
+                });
             });
 
-            gownDetails.updateGownDetails(new Dal.Models.ModelDetails
+            return getGownById(gownId)!;
+        }
+
+        /// <summary>Changes the name, color, description or image shared by all sizes of a model.</summary>
+        public ModelFullDetaills updateGownModel(int modelId, UpdateModelRequest request)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            if (gownModel.GetGownModelById(modelId) == null)
             {
-                GownId = model.Id,
-                Price = model.Price,
-                Size = model.Size,
-                ModelId = model.ModelId,
-                IsAvailable = model.IsAvailable,
+                throw new NotFoundException($"Gown model {modelId} does not exist.");
+            }
+
+            gownModel.updateGownModel(new Dal.Models.GownModel
+            {
+                Id = modelId,
+                Name = request.Name.Trim(),
+                Color = request.Color.Trim(),
+                Description = NullIfBlank(request.Description),
+                ImageUrl = NullIfBlank(request.ImageUrl),
             });
+
+            var firstSize = gownDetails.GetByModel(modelId).OrderBy(s => s.GownId).FirstOrDefault();
+            return firstSize == null
+                ? new ModelFullDetaills { ModelId = modelId, Name = request.Name, Color = request.Color }
+                : getGownById(firstSize.GownId)!;
         }
 
         public List<ModelGrouped> GetModelGroupeds()

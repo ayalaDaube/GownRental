@@ -6,6 +6,7 @@ namespace Dal.Api
     {
         List<GownModel> GetGownModels();
         GownModel? GetGownModelById(int id);
+        int GetNextId();
         void DeleteGownModel(int id);
         void createGownModel(GownModel gm);
         void updateGownModel(GownModel gm);
