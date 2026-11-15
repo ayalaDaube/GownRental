@@ -1,0 +1,65 @@
+name: Server
+
+on:
+  push:
+    branches: [main]
+    paths: ['Server/**', '.github/workflows/server.yml']
+  pull_request:
+    paths: ['Server/**', '.github/workflows/server.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer run for the same branch makes the older one pointless.
+concurrency:
+  group: server-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: Server
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Server/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore tools and packages
+        run: |
+          dotnet tool restore
+          dotnet restore
+
+      - name: Build (any warning fails the build)
+        run: dotnet build --no-restore --configuration Release -p:TreatWarningsAsErrors=true
+
+      - name: Migrations are up to date with the model
+        run: >
+          dotnet tool run dotnet-ef migrations has-pending-model-changes
+          --project Dal --startup-project Server --context Dal.Models.DataManager
+
+      - name: Test
+        run: >
+          dotnet test --no-build --configuration Release
+          --collect:"XPlat Code Coverage" --results-directory ./coverage
+
+      - name: Keep the coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-coverage
+          path: Server/coverage/**/coverage.cobertura.xml
+          if-no-files-found: ignore

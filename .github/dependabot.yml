@@ -1,0 +1,20 @@
+version: 2
+
+# Weekly pull requests that update the dependencies, so that known vulnerabilities do not pile up.
+updates:
+  - package-ecosystem: nuget
+    directory: /Server
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /Client
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
