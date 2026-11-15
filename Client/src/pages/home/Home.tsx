@@ -32,17 +32,17 @@ function Home() {
     {
       label: 'Elegant Dress',
       description: 'A subtle combination of lace and calm tones.',
-      src: 'https://images.unsplash.com/photo-1495121605193-b116b509b81?auto=format&fit=crop&w=800&q=80',
+      src: `${process.env.PUBLIC_URL}/assets/dress1.svg`,
     },
     {
       label: 'Modest Tailored Dress',
       description: 'Clean lines, high collar and a professional feel.',
-      src: 'https://images.unsplash.com/photo-1520975929932-2e007c6de34?auto=format&fit=crop&w=800&q=80',
+      src: `${process.env.PUBLIC_URL}/assets/dress2.svg`,
     },
     {
       label: 'Festive Dress',
       description: 'A feminine and elegant look with a dignified structure.',
-      src: 'https://images.unsplash.com/photo-1533106418985-7203c6f5d35?auto=format&fit=crop&w=800&q=80',
+      src: `${process.env.PUBLIC_URL}/assets/dress3.svg`,
     },
   ];
 

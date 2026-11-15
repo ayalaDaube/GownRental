@@ -3,6 +3,7 @@ import './GownModel.css';
 import GownModelDetails from '../gownModelDetails/GownModelDetails';
 import Update from '../../../components/gown/update/Update';
 import DeleteButton from '../../../components/gown/deleteButton/DeleteButton';
+import GownImage from '../../common/GownImage';
 import { GownModelProps } from '../../../redux/Gowns/GownTypes';
 
 function GownModel({ id, name, color, description, image, details }: GownModelProps) {
@@ -10,6 +11,7 @@ function GownModel({ id, name, color, description, image, details }: GownModelPr
 
     return (
         <div className="gown-model-card">
+            <GownImage gownId={id} name={name} src={image} />
             <div className="gown-model-header" onClick={() => setIsOpen(!isOpen)}>
                 <div className="gown-model-top-row">
                     <div className="gown-model-info">

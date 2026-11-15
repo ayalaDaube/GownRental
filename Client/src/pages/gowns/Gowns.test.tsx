@@ -47,6 +47,14 @@ describe('the list', () => {
     expect(screen.getByText('black')).toBeInTheDocument();
   });
 
+  test('every model card shows its picture, or a bundled one when it has none', async () => {
+    loadGowns.mockResolvedValue([{ ...gownModels[0], image: 'https://example.com/simple.jpg' }, gownModels[1]]);
+    await openPage();
+
+    expect(screen.getByRole('img', { name: 'Simple Gown' })).toHaveAttribute('src', 'https://example.com/simple.jpg');
+    expect(screen.getByRole('img', { name: 'Evening Gown' }).getAttribute('src')).toMatch(/\/assets\/dress[123]\.svg$/);
+  });
+
   test('a spinner is shown while the gowns load', () => {
     loadGowns.mockReturnValue(new Promise(() => undefined));
     renderWithApp(<Gowns />, { preloadedState: signedInState });
