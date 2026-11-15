@@ -151,3 +151,10 @@
     font-size: 26px;
   }
 }
+
+.gowns-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-mid);
+  padding: 32px 0;
+}

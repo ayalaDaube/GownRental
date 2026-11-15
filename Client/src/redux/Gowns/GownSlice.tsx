@@ -126,11 +126,12 @@ const gownSlice = createSlice({
                 state.isLoading = false;
                 state.gowns = action.payload;
             })
-            .addCase(fetchGowns.rejected, (state, action) => {
+            .addCase(fetchGowns.rejected, (state) => {
                 state.isLoading = false;
-                state.error = action.error.message || "Failed to fetch gowns";
+                state.error = "Could not load the gowns. Please try again.";
             })
             .addCase(fetchGroupsGowns.pending, (state) => {
+                state.error = null;
                 // Show the spinner only for the first load; a refresh after an edit keeps the list (and open cards) in place.
                 if (state.gowns.length === 0) {
                     state.isLoading = true;
@@ -138,10 +139,12 @@ const gownSlice = createSlice({
             })
             .addCase(fetchGroupsGowns.fulfilled, (state, action) => {
                 state.isLoading = false;
+                state.error = null;
                 state.gowns = action.payload;
             })
-            .addCase(fetchGroupsGowns.rejected, (state, action) => {
-                state.error = action.error.message || "Failed to fetch groups gowns";
+            .addCase(fetchGroupsGowns.rejected, (state) => {
+                state.isLoading = false;
+                state.error = "Could not load the gowns. Please try again.";
             })
             .addCase(addGownThunk.fulfilled, (state) => {
                 state.notice = { type: 'success', text: 'The gown was added.' };
@@ -188,14 +191,16 @@ const gownSlice = createSlice({
             })
             .addCase(getAvailableGownsByDate.fulfilled, (state, action) => {
                 state.isLoading = false;
+                state.error = null;
                 state.gowns = action.payload;
             })
             .addCase(getAvailableGownsByDate.pending, (state) => {
+                state.error = null;
                 state.isLoading = true;
             })
-            .addCase(getAvailableGownsByDate.rejected, (state, action) => {
+            .addCase(getAvailableGownsByDate.rejected, (state) => {
                 state.isLoading = false;
-                state.error = action.error.message || "Failed to fetch gowns";
+                state.error = "Could not check which gowns are available. Please try again.";
             });
     }
 });

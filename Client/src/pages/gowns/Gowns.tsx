@@ -59,7 +59,14 @@ function Gowns() {
   }, [dispatch]);
 
   if (isLoading) return <Spinner />;
-  if (error) return <div>{error}</div>;
+  if (error) {
+    return (
+      <div className="gowns-page" role="alert">
+        <p>{error}</p>
+        <button onClick={refresh}>Try again</button>
+      </div>
+    );
+  }
 
   return (
     <div className="gowns-page">
@@ -72,7 +79,7 @@ function Gowns() {
           <input placeholder="Search by Size" value={searchBySize} onChange={handleSearchBySize} type="number" />
         </div>
         <div className="gowns-date-search">
-          <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+          <input type="date" aria-label="Event date to check" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
           <button onClick={refresh}>Check Availability</button>
         </div>
         <Create onAdd={handleAdd} />
@@ -81,6 +88,11 @@ function Gowns() {
         {filteredGowns.map((gown) => (
           <GownModel key={gown.id} {...gown} />
         ))}
+        {filteredGowns.length === 0 && (
+          <p className="gowns-empty">
+            {gowns.length === 0 ? 'There are no gowns yet. Add the first one with the button above.' : 'No gowns match your search.'}
+          </p>
+        )}
       </div>
       <button className="place-order-btn" onClick={() => setIsOrderOpen(true)}>Place Order ({cart.length})</button>
       {isOrderOpen && (

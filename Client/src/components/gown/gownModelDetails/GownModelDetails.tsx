@@ -109,7 +109,7 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                     </div>
                 );
             })}
-            <form className="gown-add-size" onSubmit={handleAddSize}>
+            <form className="gown-add-size" aria-label="Add a size" onSubmit={handleAddSize}>
                 <span className="gown-add-size-label">Add a size</span>
                 <input type="number" value={newSize.size} onChange={e => setNewSize({ ...newSize, size: e.target.value })} placeholder="Size" min={1} max={100} required className="gown-detail-edit-input" />
                 <input type="number" value={newSize.price} onChange={e => setNewSize({ ...newSize, price: e.target.value })} placeholder="Price" min={1} max={100000} step="any" required className="gown-detail-edit-input" />
