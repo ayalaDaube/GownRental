@@ -14,7 +14,10 @@ namespace Bl
 
         private static readonly Regex IdFormat = new("^[A-Z0-9]{5,9}$", RegexOptions.Compiled);
         private static readonly Regex PhoneFormat = new(@"^\+?[0-9]{9,13}$", RegexOptions.Compiled);
-        private static readonly Regex EmailFormat = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
+        // letters, digits and . _ % + - before the @; a domain of letters, digits and hyphens separated by dots, ending in 2 or more letters
+        private static readonly Regex EmailFormat = new(
+            @"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$",
+            RegexOptions.Compiled);
 
         /// <summary>An id number or passport number: 5 to 9 letters or digits, stored in capitals.</summary>
         public static string NormalizeId(string? id)
