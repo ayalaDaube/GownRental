@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../redux/Auth/AuthSlice';
-import { AppDispatch, RootState } from '../../store/store';
 import './Home.css';
 
 function Home() {
-  const dispatch = useDispatch<AppDispatch>();
-  const isSignedIn = useSelector((state: RootState) => Boolean(state.auth.token));
+  const dispatch = useAppDispatch();
+  const isSignedIn = useAppSelector((state) => Boolean(state.auth.token));
 
   const visitorCards = [
     {

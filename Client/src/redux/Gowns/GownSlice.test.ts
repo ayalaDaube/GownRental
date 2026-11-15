@@ -135,7 +135,7 @@ test('editing a size and a model is sent to the server and reported', async () =
   expect(store.getState().gowns.notice).toEqual({ type: 'error', text: 'The Name field is required.' });
 });
 
-const cartItem = (gownId: number) => ({ gownId, size: 36, name: 'Gown', modelId: 1, price: 100, isActive: true, isAvailable: true });
+const cartItem = (gownId: number) => ({ gownId, size: 36, name: 'Gown', color: 'Blue', modelId: 1, price: 100, isActive: true, isAvailable: true });
 
 test('placing an order sends all the gowns in one request, empties the cart and reports success', async () => {
   placeOrder.mockResolvedValue({ rentals: [] });

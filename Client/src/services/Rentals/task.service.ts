@@ -1,5 +1,5 @@
 import http from '../http';
-import { RentalProps } from '../../pages/rentals/rentalview/Rental';
+import { RentalProps } from '../../redux/Rentals/RentalType';
 
 const RENTALS_API_URL = '/Rentals';
 

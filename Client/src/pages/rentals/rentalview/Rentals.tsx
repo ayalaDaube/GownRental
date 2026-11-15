@@ -1,5 +1,5 @@
 import Rental from './Rental';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { useEffect } from 'react';
 import Spinner from '../../../components/rental/spinner/Spinner';
 import { dismissNotice, getRentals, getReturning, getRenting } from '../../../redux/Rentals/RentalSlice';
@@ -7,16 +7,16 @@ import Notice from '../../../components/common/Notice';
 import './Rental.css';
 
 function Rentals() {
-  const allRentals = useSelector((state: any) => state.rentals.rentals);
-  const isLoading = useSelector((state: any) => state.rentals.isLoading);
-  const notice = useSelector((state: any) => state.rentals.notice);
-  const dispatch = useDispatch();
+  const allRentals = useAppSelector((state) => state.rentals.rentals);
+  const isLoading = useAppSelector((state) => state.rentals.isLoading);
+  const notice = useAppSelector((state) => state.rentals.notice);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getRentals() as any);
-    dispatch(getReturning() as any);
-    dispatch(getRenting() as any);
-  }, []);
+    dispatch(getRentals());
+    dispatch(getReturning());
+    dispatch(getRenting());
+  }, [dispatch]);
 
   if (isLoading) {
     return (
@@ -29,7 +29,7 @@ function Rentals() {
     <div className="rentals-page">
       {notice && <Notice type={notice.type} text={notice.text} onClose={() => dispatch(dismissNotice())} />}
       <div className="rentals-list">
-        {allRentals.map((rental: any) => (
+        {allRentals.map((rental) => (
           <Rental key={rental.rentalId} {...rental} />
         ))}
       </div>

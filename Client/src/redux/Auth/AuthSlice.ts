@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { clearSession, loadSession, saveSession } from '../../auth/session';
 import http from '../../services/http';
+import { getErrorStatus } from '../../services/apiError';
 
 export interface AuthState {
   token: string | null;
@@ -36,11 +37,12 @@ export const login = createAsyncThunk<
     const response = await http.post<LoginResponse>('/Auth/login', credentials);
     saveSession(response.data);
     return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
+  } catch (error) {
+    const status = getErrorStatus(error);
+    if (status === 401) {
       return rejectWithValue('Wrong username or password.');
     }
-    if (error.response?.status === 429) {
+    if (status === 429) {
       return rejectWithValue('Too many attempts. Please wait a minute and try again.');
     }
     return rejectWithValue('Could not reach the server. Please try again.');

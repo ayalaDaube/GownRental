@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import './PlaceOrder.css'
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../../store/hooks';
 import { placeOrderThunk } from '../../../redux/Gowns/GownSlice';
-import { AppDispatch } from '../../../store/store';
+import { CartItem } from '../../../redux/Gowns/GownTypes';
 
 export interface PlaceOrderProps {
-  cart: any[];
+  cart: CartItem[];
   onClose: () => void;
   /** Called after the order was saved, so the page can refresh what is available. */
   onPlaced?: () => void;
@@ -14,7 +14,7 @@ export interface PlaceOrderProps {
 }
 
 const PlaceOrder: React.FC<PlaceOrderProps> = ({ cart, onClose, onPlaced, defaultEventDate }) => {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [form, setForm] = useState({

@@ -1,33 +1,41 @@
 import React, { useState } from 'react';
 import './GownModelDetails.css';
-import { ModelDetails } from '../gownModel/GownModel';
-import { useDispatch, useSelector } from 'react-redux';
+import { CartItem, GownSize } from '../../../redux/Gowns/GownTypes';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { addGownThunk, addToCart, deleteGownThunk, updateGownSizeThunk, fetchGroupsGowns } from '../../../redux/Gowns/GownSlice';
 import { FaShoppingCart, FaTrashAlt, FaEdit } from 'react-icons/fa';
 
 interface GownModelDetailsProps {
-    details: ModelDetails[];
-    gownInfo: { id: number, name: string, color: string, description: string, image?: string };
+    details: GownSize[];
+    gownInfo: { id: number, name: string, color: string, description?: string | null, image?: string | null };
 }
 
+const toCartItem = (detail: GownSize, gownInfo: GownModelDetailsProps['gownInfo']): CartItem => ({
+    ...detail,
+    name: gownInfo.name,
+    color: gownInfo.color,
+    description: gownInfo.description,
+    image: gownInfo.image,
+});
+
 function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
-    const dispatch = useDispatch();
-    const cart = useSelector((state: any) => state.gowns.Cart);
+    const dispatch = useAppDispatch();
+    const cart = useAppSelector((state) => state.gowns.Cart);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [editForm, setEditForm] = useState<Partial<ModelDetails>>({});
+    const [editForm, setEditForm] = useState<Partial<GownSize>>({});
     const [newSize, setNewSize] = useState({ size: '', price: '' });
 
-    const handleEditClick = (detail: ModelDetails) => {
+    const handleEditClick = (detail: GownSize) => {
         setEditingId(detail.gownId);
         setEditForm({ size: detail.size, price: detail.price, isActive: detail.isActive });
     };
 
-    const handleDelete = (detail: ModelDetails) => {
+    const handleDelete = (detail: GownSize) => {
         if (!window.confirm(`Delete size ${detail.size} (gown #${detail.gownId})?`)) return;
-        dispatch(deleteGownThunk(detail.gownId) as any).then(() => dispatch(fetchGroupsGowns() as any));
+        dispatch(deleteGownThunk(detail.gownId)).then(() => dispatch(fetchGroupsGowns()));
     };
 
-    const handleSave = async (detail: ModelDetails) => {
+    const handleSave = async (detail: GownSize) => {
         const result = await dispatch(updateGownSizeThunk({
             gownId: detail.gownId,
             changes: {
@@ -35,8 +43,8 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                 price: Number(editForm.price),
                 isActive: editForm.isActive ?? true,
             },
-        }) as any);
-        dispatch(fetchGroupsGowns() as any);
+        }));
+        dispatch(fetchGroupsGowns());
         if (updateGownSizeThunk.fulfilled.match(result)) {
             setEditingId(null);
         }
@@ -48,17 +56,17 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
             modelId: gownInfo.id,
             size: Number(newSize.size),
             price: Number(newSize.price),
-        }) as any);
+        }));
         if (addGownThunk.fulfilled.match(result)) {
             setNewSize({ size: '', price: '' });
-            dispatch(fetchGroupsGowns() as any);
+            dispatch(fetchGroupsGowns());
         }
     };
 
     return (
         <div className="gown-model-details">
             {details.map((detail) => {
-                const inCart = cart.some((item: any) => item.gownId === detail.gownId);
+                const inCart = cart.some(item => item.gownId === detail.gownId);
                 const isEditing = editingId === detail.gownId;
                 return (
                     <div key={detail.gownId} className="gown-detail-card">
@@ -92,7 +100,7 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                             <button
                                 className={`gown-cart-btn ${inCart ? 'gown-cart-btn--active' : ''} ${!detail.isAvailable ? 'gown-cart-btn--disabled' : ''}`}
                                 title={!detail.isActive ? 'Out of stock' : !detail.isAvailable ? 'Not available on that date' : inCart ? 'Remove from cart' : 'Add to cart'}
-                                onClick={() => dispatch(addToCart({ ...detail, ...gownInfo }))}
+                                onClick={() => dispatch(addToCart(toCartItem(detail, gownInfo)))}
                                 disabled={!detail.isAvailable}
                             >
                                 <FaShoppingCart />

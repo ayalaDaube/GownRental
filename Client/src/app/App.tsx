@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../store/hooks';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Home from '../pages/home/Home';
 import Login from '../pages/login/Login';
@@ -13,10 +13,9 @@ import Appointments from '../pages/appointments/appointments';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import { logout } from '../redux/Auth/AuthSlice';
 import { AUTH_EXPIRED_EVENT } from '../services/http';
-import { AppDispatch } from '../store/store';
 
 function App() {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   // The server rejected our token (expired or invalid): sign out and ask the user to sign in again.

@@ -1,14 +1,14 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getApiErrorMessage } from "../../services/apiError";
 import { fetchAllGowns, createGownApi, deleteGownApi, deleteGownModelApi, updateGownSizeApi, updateGownModelApi, fetchAllGroupsGowns, fetchAvailableGownsByDate, NewGownInput, GownSizeChanges, GownModelChanges } from "../../services/Gowns/task.service";
-import GownModel, { GownModelProps } from "../../components/gown/gownModel/GownModel";
+import { CartItem, GownModelProps } from "./GownTypes";
 import { placeOrderApi, OrderInput } from "../../services/Orders/task.service";
 export interface initialStateType {
     gowns: GownModelProps[];
     isLoading: boolean;
     error: string | null;
     notice: { type: 'error' | 'success'; text: string } | null;
-    Cart: any[];
+    Cart: CartItem[];
 }
 
 const initialState: initialStateType = {
@@ -106,11 +106,11 @@ const gownSlice = createSlice({
         dismissNotice: (state) => {
             state.notice = null;
         },
-        addToCart: (state, action) => {
+        addToCart: (state, action: PayloadAction<CartItem>) => {
             const item = action.payload;
-            const exists = state.Cart.find((c: any) => c.gownId === item.gownId);
+            const exists = state.Cart.find(c => c.gownId === item.gownId);
             if (exists) {
-                state.Cart = state.Cart.filter((c: any) => c.gownId !== item.gownId);
+                state.Cart = state.Cart.filter(c => c.gownId !== item.gownId);
             } else {
                 state.Cart.push(item);
             }
@@ -155,7 +155,7 @@ const gownSlice = createSlice({
                     model.details = model.details.filter(detail => detail.gownId !== action.payload);
                 });
                 state.gowns = state.gowns.filter(model => model.details.length > 0);
-                state.Cart = state.Cart.filter((item: any) => item.gownId !== action.payload);
+                state.Cart = state.Cart.filter(item => item.gownId !== action.payload);
             })
             .addCase(deleteGownThunk.rejected, (state, action) => {
                 state.notice = { type: 'error', text: action.payload ?? 'Could not delete the gown.' };

@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchAllAppointments, deleteAppointmentThunk, dismissNotice } from '../../redux/Appointments/AppointmentSlice';
 import Notice from '../../components/common/Notice';
-import { RootState } from '../../store/store';
 import { AppointmentType } from '../../redux/Appointments/AppointmentType';
 import './appointments.css';
 
 function EmployeeAppointments() {
-    const dispatch = useDispatch<any>();
-    const { all, isLoading, notice } = useSelector((state: RootState) => state.appointments);
+    const dispatch = useAppDispatch();
+    const { all, isLoading, notice } = useAppSelector((state) => state.appointments);
     const [searchId, setSearchId] = useState('');
 
     useEffect(() => {

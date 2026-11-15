@@ -1,53 +1,65 @@
+import React, { useEffect, useState } from 'react';
 import GownModel from '../../components/gown/gownModel/GownModel';
-import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
 import Spinner from '../../components/rental/spinner/Spinner';
 import Create from '../../components/gown/create/Create';
-import { addGownThunk, dismissNotice, fetchGroupsGowns, getAvailableGownsByDate } from '../../redux/Gowns/GownSlice';
-import { NewGownInput } from '../../services/Gowns/task.service';
 import Notice from '../../components/common/Notice';
-import './Gown.css';
 import PlaceOrder from '../../components/gown/placeOrder/PlaceOrder';
+import { addGownThunk, dismissNotice, fetchGroupsGowns, getAvailableGownsByDate } from '../../redux/Gowns/GownSlice';
+import { GownModelProps } from '../../redux/Gowns/GownTypes';
+import { NewGownInput } from '../../services/Gowns/task.service';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import './Gown.css';
 
 function Gowns() {
-  const gowns = useSelector((state: any) => state.gowns.gowns);
-  const isLoading = useSelector((state: any) => state.gowns.isLoading);
-  const error = useSelector((state: any) => state.gowns.error);
-  const cart = useSelector((state: any) => state.gowns.Cart);
-  const notice = useSelector((state: any) => state.gowns.notice);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { gowns, isLoading, error, notice, Cart: cart } = useAppSelector((state) => state.gowns);
   const [searchById, setSearchById] = useState('');
   const [searchBySize, setSearchBySize] = useState('');
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
 
-  const filterdGowns = gowns.filter((gown: any) =>
-   ( gown.id.toString().includes(searchById) | gown.details.some((detail: any) => detail.gownId.toString().includes(searchById))) && gown.details.some((detail: any) => detail.size.toString().includes(searchBySize)));
+  // A model is shown when its id or the id of one of its sizes matches, and one of its sizes has the typed size.
+  const matchesSearch = (gown: GownModelProps) => {
+    const matchesId = gown.id.toString().includes(searchById)
+      || gown.details.some(detail => detail.gownId.toString().includes(searchById));
+    const matchesSize = gown.details.some(detail => detail.size.toString().includes(searchBySize));
+    return matchesId && matchesSize;
+  };
+  const filteredGowns = gowns.filter(matchesSearch);
 
-  const handleSearchById = (event: any) => {
+  const handleSearchById = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchById(event.target.value);
-  }
+  };
 
-  const handleSearchBySize = (event: any) => {
+  const handleSearchBySize = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchBySize(event.target.value);
-  }
+  };
+
+  // Shows what is available on the chosen date, or all gowns when no date is chosen.
+  const refresh = () => {
+    if (selectedDate) {
+      dispatch(getAvailableGownsByDate(selectedDate));
+    } else {
+      dispatch(fetchGroupsGowns());
+    }
+  };
+
   // Resolves to true when the gown was saved, so the form knows whether it can close.
   const handleAdd = async (input: NewGownInput): Promise<boolean> => {
-    const result = await dispatch(addGownThunk(input) as any);
+    const result = await dispatch(addGownThunk(input));
     if (addGownThunk.fulfilled.match(result)) {
-      dispatch(fetchGroupsGowns() as any);
+      dispatch(fetchGroupsGowns());
       return true;
     }
     return false;
   };
 
   useEffect(() => {
-    dispatch(fetchGroupsGowns() as any);
-  }, []);
+    dispatch(fetchGroupsGowns());
+  }, [dispatch]);
 
   if (isLoading) return <Spinner />;
   if (error) return <div>{error}</div>;
-
 
   return (
     <div className="gowns-page">
@@ -61,26 +73,26 @@ function Gowns() {
         </div>
         <div className="gowns-date-search">
           <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
-          <button onClick={() => selectedDate ? dispatch(getAvailableGownsByDate(selectedDate) as any) : dispatch(fetchGroupsGowns() as any)}>Check Availability</button>
+          <button onClick={refresh}>Check Availability</button>
         </div>
         <Create onAdd={handleAdd} />
       </div>
       <div className="gowns-list">
-        {filterdGowns.map((gown: any) => (
+        {filteredGowns.map((gown) => (
           <GownModel key={gown.id} {...gown} />
         ))}
       </div>
-      <button className="place-order-btn" onClick={() => setIsOrderOpen(true)}>Place Order ({cart?.length || 0})</button>
+      <button className="place-order-btn" onClick={() => setIsOrderOpen(true)}>Place Order ({cart.length})</button>
       {isOrderOpen && (
         <PlaceOrder
           cart={cart}
           defaultEventDate={selectedDate}
           onClose={() => setIsOrderOpen(false)}
-          onPlaced={() => dispatch((selectedDate ? getAvailableGownsByDate(selectedDate) : fetchGroupsGowns()) as any)}
+          onPlaced={refresh}
         />
       )}
     </div>
   );
-} 
+}
 
 export default Gowns;

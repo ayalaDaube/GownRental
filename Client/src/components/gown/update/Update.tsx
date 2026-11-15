@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import './Update.css';
 import { FaEdit } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../../store/hooks';
 import { fetchGroupsGowns, updateGownModelThunk } from '../../../redux/Gowns/GownSlice';
-import { GownModelProps } from '../../../components/gown/gownModel/GownModel';
+import { GownModelProps } from '../../../redux/Gowns/GownTypes';
 
 const Update: React.FC<{ gown: GownModelProps }> = ({ gown }) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [form, setForm] = useState({
@@ -31,11 +31,11 @@ const Update: React.FC<{ gown: GownModelProps }> = ({ gown }) => {
                 description: form.description.trim() || undefined,
                 imageUrl: form.image.trim() || null,
             },
-        }) as any);
+        }));
         setIsSaving(false);
 
         if (updateGownModelThunk.fulfilled.match(result)) {
-            dispatch(fetchGroupsGowns() as any);
+            dispatch(fetchGroupsGowns());
             setIsEditing(false);
         }
     };

@@ -1,7 +1,6 @@
 import { ReactElement } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { useAppSelector } from '../../store/hooks';
 
 interface ProtectedRouteProps {
   children: ReactElement;
@@ -13,7 +12,7 @@ interface ProtectedRouteProps {
  * so this only decides what the browser shows.
  */
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const token = useSelector((state: RootState) => state.auth.token);
+  const token = useAppSelector((state) => state.auth.token);
   const location = useLocation();
 
   if (!token) {

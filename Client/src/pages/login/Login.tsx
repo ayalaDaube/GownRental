@@ -1,8 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { login } from '../../redux/Auth/AuthSlice';
-import { AppDispatch, RootState } from '../../store/store';
 import './Login.css';
 
 interface LocationState {
@@ -10,10 +9,10 @@ interface LocationState {
 }
 
 function Login() {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, isLoading, error } = useSelector((state: RootState) => state.auth);
+  const { token, isLoading, error } = useAppSelector((state) => state.auth);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

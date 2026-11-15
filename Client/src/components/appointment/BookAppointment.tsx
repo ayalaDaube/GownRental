@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 import { AppointmentType } from '../../redux/Appointments/AppointmentType';
 import { bookAppointmentThunk, fetchAvailableAppointments } from '../../redux/Appointments/AppointmentSlice';
 import '../../pages/appointments/appointments.css';
@@ -10,7 +10,7 @@ interface Props {
 }
 
 function BookAppointment({ appointment, onClose }: Props) {
-    const dispatch = useDispatch<any>();
+    const dispatch = useAppDispatch();
     const [form, setForm] = useState({ customerId: '', customerName: '', customerPhone: '', customerEmail: '', numberOfPeople: 1 });
     const [confirmed, setConfirmed] = useState(false);
     const [isSaving, setIsSaving] = useState(false);

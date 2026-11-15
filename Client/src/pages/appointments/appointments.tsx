@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchAvailableAppointments } from '../../redux/Appointments/AppointmentSlice';
-import { RootState } from '../../store/store';
 import { AppointmentType } from '../../redux/Appointments/AppointmentType';
 import BookAppointment from '../../components/appointment/BookAppointment';
 import './appointments.css';
 
 function Appointments() {
-    const dispatch = useDispatch<any>();
-    const { available, isLoading } = useSelector((state: RootState) => state.appointments);
+    const dispatch = useAppDispatch();
+    const { available, isLoading } = useAppSelector((state) => state.appointments);
     const [selected, setSelected] = useState<AppointmentType | null>(null);
 
     useEffect(() => {

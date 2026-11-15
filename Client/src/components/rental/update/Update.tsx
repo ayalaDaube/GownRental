@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import './Update.css';
 import { FaEdit } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../../store/hooks';
 import { updateRentalThunk, getReturning, getRenting } from '../../../redux/Rentals/RentalSlice';
-import { RentalProps } from '../../../pages/rentals/rentalview/Rental';
-import { AppDispatch } from '../../../store/store';
+import { RentalProps } from '../../../redux/Rentals/RentalType';
 
 const toForm = (rental: RentalProps) => ({
     customerId: rental.customerId,
@@ -13,7 +12,7 @@ const toForm = (rental: RentalProps) => ({
 });
 
 const Update: React.FC<{ rental: RentalProps }> = ({ rental }) => {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const [isOpen, setIsOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);

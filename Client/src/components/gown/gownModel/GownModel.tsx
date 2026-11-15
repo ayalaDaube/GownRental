@@ -3,26 +3,7 @@ import './GownModel.css';
 import GownModelDetails from '../gownModelDetails/GownModelDetails';
 import Update from '../../../components/gown/update/Update';
 import DeleteButton from '../../../components/gown/deleteButton/DeleteButton';
-
-export interface ModelDetails {
-    gownId: number;
-    size: number;
-    modelId: number;
-    price: number;
-    /** The gown is in the inventory (not retired or damaged). */
-    isActive: boolean;
-    /** The gown can be rented: in the inventory and, when a date is chosen, not rented around it. */
-    isAvailable: boolean;
-}
-
-export interface GownModelProps {
-    id: number;
-    name: string;
-    color: string;
-    description: string;
-    image?: string;
-    details: ModelDetails[];
-}
+import { GownModelProps } from '../../../redux/Gowns/GownTypes';
 
 function GownModel({ id, name, color, description, image, details }: GownModelProps) {
     const [isOpen, setIsOpen] = useState(false);

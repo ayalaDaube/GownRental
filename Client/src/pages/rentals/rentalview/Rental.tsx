@@ -1,15 +1,7 @@
 import './Rental.css';
 import DeleteButton from '../../../components/rental/deleteButton/DeleteButton';
 import Update from '../../../components/rental/update/Update';
-
-export interface RentalProps {
-    rentalId: number,
-    customerId: string,
-    rentalDate: string,
-    eventDate: string,
-    gownId: number,
-    size: number
-}
+import { RentalProps } from '../../../redux/Rentals/RentalType';
 
 function Rental({ rentalId, customerId, rentalDate, eventDate, gownId, size }: RentalProps) {
     return (

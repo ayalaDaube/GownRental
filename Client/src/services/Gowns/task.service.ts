@@ -1,4 +1,5 @@
 import http from '../http';
+import { GownModelProps } from '../../redux/Gowns/GownTypes';
 
 const GOWNS_API_URL = '/Gowns';
 
@@ -32,8 +33,8 @@ export const fetchAllGowns = async () => {
     const res = await http.get(GOWNS_API_URL);
     return res.data;
 };
-export const fetchAllGroupsGowns = async () => {
-    const res = await http.get(`${GOWNS_API_URL}/groups`);
+export const fetchAllGroupsGowns = async (): Promise<GownModelProps[]> => {
+    const res = await http.get<GownModelProps[]>(`${GOWNS_API_URL}/groups`);
     return res.data;
 };
 export const createGownApi = async (input: NewGownInput) => {
@@ -56,7 +57,7 @@ export const updateGownModelApi = async (modelId: number, changes: GownModelChan
     return res.data;
 };
 
-export const fetchAvailableGownsByDate = async (date: string) => {
-    const res = await http.get(`${GOWNS_API_URL}/byDate?date=${date}`);
+export const fetchAvailableGownsByDate = async (date: string): Promise<GownModelProps[]> => {
+    const res = await http.get<GownModelProps[]>(`${GOWNS_API_URL}/byDate?date=${date}`);
     return res.data;
 }

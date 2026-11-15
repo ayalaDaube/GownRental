@@ -1,7 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../redux/Auth/AuthSlice';
-import { AppDispatch, RootState } from '../../store/store';
 import '../home/Home.css';
 
 function SecretaryHome() {
@@ -39,8 +38,8 @@ function SecretaryHome() {
   ];
 
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const username = useSelector((state: RootState) => state.auth.username);
+  const dispatch = useAppDispatch();
+  const username = useAppSelector((state) => state.auth.username);
 
   return (
     <main className="home-page">

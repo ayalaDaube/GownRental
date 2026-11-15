@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import './Create.css';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../../store/hooks';
 import { addRentalThunk, getRentals, getReturning, getRenting } from '../../../redux/Rentals/RentalSlice';
-import { AppDispatch } from '../../../store/store';
 
 const emptyForm = { customerId: '', eventDate: '', gownId: '', customerName: '', customerPhone: '', customerEmail: '' };
 
 const Create: React.FC = () => {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const [isOpen, setIsOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);

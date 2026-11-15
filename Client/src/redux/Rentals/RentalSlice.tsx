@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RentalProps } from "../../pages/rentals/rentalview/Rental";
+import { RentalProps } from "./RentalType";
 import {
   fetchAllRentals, createRentalApi, deleteRentalApi, updateRentalApi, fetchReturning, fetchRenting,
   NewRentalInput, RentalChangesInput,
