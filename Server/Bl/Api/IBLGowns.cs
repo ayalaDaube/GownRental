@@ -11,7 +11,7 @@ namespace Bl.Api
     {
         ModelFullDetails CreateGown(NewGownRequest request);
             List<ModelFullDetails> GetFullGowns();
-            ModelFullDetails GetGownById(int id);
+            ModelFullDetails? GetGownById(int id);
             ModelFullDetails UpdateGownSize(int gownId, UpdateSizeRequest request);
             ModelFullDetails UpdateGownModel(int modelId, UpdateModelRequest request);
             void DeleteGown(int id);

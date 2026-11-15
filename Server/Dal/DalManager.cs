@@ -1,7 +1,6 @@
 ﻿using Dal.Api;
 using Dal.Models;
 using Microsoft.EntityFrameworkCore;
-using Dal.Models;
 using Dal.Services;
 
 namespace Dal

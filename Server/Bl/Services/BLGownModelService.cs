@@ -145,7 +145,7 @@ namespace Bl.Services
                     select new ModelFullDetails
                     {
                         Id = d.GownId,
-                        Name = g.Name,
+                        Name = g.Name ?? string.Empty,
                         Color = g.Color,
                         Description = g.Description,
                         ImageUrl = g.ImageUrl,
@@ -255,7 +255,7 @@ namespace Bl.Services
             {
                 Id = group.First().ModelId,
                 Name = group.First().Name,
-                Color = group.First().Color,
+                Color = group.First().Color ?? string.Empty,
                 Description = group.First().Description,
                 Image = group.First().ImageUrl,
                 Details = group.Select(g => new GownSizeInfo

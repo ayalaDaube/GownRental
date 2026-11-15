@@ -1,0 +1,8 @@
+<Project>
+
+  <!-- Missing null checks are bugs waiting to happen: do not let them pass silently. -->
+  <PropertyGroup>
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

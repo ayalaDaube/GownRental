@@ -8,7 +8,7 @@ namespace Bl.Models
 {
     public class RentalFullDetails
     {
-        public string CustomerId { get; set; }
+        public string CustomerId { get; set; } = string.Empty;
         public DateTime RentalDate { get; set; }
         public DateOnly EventDate { get; set; }
         public int RentalId { get; set; }
