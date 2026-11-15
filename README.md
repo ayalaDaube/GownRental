@@ -135,6 +135,10 @@ The client runs at http://localhost:3000 and calls the API at `https://localhost
 
 Staff sign in at http://localhost:3000/login. Visitors can use the home page and appointment booking without an account.
 
+### Code quality
+
+The server builds without warnings and treats nullability warnings as errors (`Server/Directory.Build.props`). The client is TypeScript in strict mode, ESLint rejects explicit `any` outside tests, and `CI=true npm run build` fails on any warning. Data is filtered by the database, never by loading whole tables into memory.
+
 ### Run the tests
 
 ```bash
@@ -154,7 +158,7 @@ The core flows work end to end. The goal is a polished product, in this order:
 - [x] Reproducible database: EF Core migrations and demo data
 - [x] Real authentication (JWT) and role-based authorization instead of a client-side password
 - [x] Bug fixes in deletion, order placement and availability logic
-- [ ] Code cleanup and strict typing in the client
+- [x] Code cleanup and strict typing in the client
 - [ ] Automated tests and continuous integration
 - [ ] Right-to-left layout and real gown images
 
