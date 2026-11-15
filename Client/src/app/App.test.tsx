@@ -101,15 +101,13 @@ describe('signing out', () => {
     expect(screen.getByRole('link', { name: 'Staff sign-in' })).toBeInTheDocument();
   });
 
-  test('after signing out the staff pages are closed again', () => {
-    const { store } = renderWithApp(<App />, { route: '/secretary', preloadedState: signedInState });
+  test('after signing out the home page is shown, not the sign-in page', () => {
+    renderWithApp(<App />, { route: '/secretary', preloadedState: signedInState });
 
     act(() => screen.getByRole('button', { name: 'Sign out' }).click());
-    expect(store.getState().auth.token).toBeNull();
-    // the browser's back button or a typed address now leads to the sign-in page
-    const second = renderWithApp(<App />, { route: '/gowns' });
 
-    expect(second.container.querySelector('.login-card')).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Your Rental Experience Starts Here' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Staff sign-in' })).not.toBeInTheDocument();
   });
 
   test('when the server says the session ended the user is sent to sign in again', async () => {
