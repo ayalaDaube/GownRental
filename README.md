@@ -7,6 +7,24 @@ A full-stack web application for managing an evening-gown rental business: a gow
 
 It was built as a team study project for a client who rents out evening gowns for events, and is now being developed further toward a production-quality product (see [Status](#status-and-roadmap)).
 
+## Screenshots
+
+Taken from the running application with the fictional demo data.
+
+| Home page | Booking a fitting (visitors) |
+|---|---|
+| ![Home page](docs/screenshots/home.png) | ![Booking a fitting appointment](docs/screenshots/book-appointment.png) |
+
+| Staff sign-in | Staff home |
+|---|---|
+| ![Staff sign-in](docs/screenshots/login.png) | ![Staff home](docs/screenshots/secretary-home.png) |
+
+| Gown catalog | Rentals and today's pick-ups and returns |
+|---|---|
+| ![Gown catalog](docs/screenshots/gowns.png) | ![Rentals](docs/screenshots/rentals.png) |
+
+![Appointment management for the staff](docs/screenshots/staff-appointments.png)
+
 ## Features
 
 **Visitors (no account needed)**
