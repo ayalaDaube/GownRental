@@ -81,11 +81,12 @@ const rentalSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getRentals.pending, (state) => {
+        state.error = null;
         // The spinner is for the first load only; a refresh after an edit keeps the list in place.
         if (state.rentals.length === 0) state.isLoading = true;
       })
       .addCase(getRentals.fulfilled, (state, action) => { state.isLoading = false; state.rentals = action.payload; state.error = null; })
-      .addCase(getRentals.rejected, (state) => { state.isLoading = false; state.error = "Failed to load rentals."; })
+      .addCase(getRentals.rejected, (state) => { state.isLoading = false; state.error = "Could not load the rentals. Please try again."; })
 
       .addCase(addRentalThunk.fulfilled, (state, action) => { state.rentals.push(action.payload); })
 

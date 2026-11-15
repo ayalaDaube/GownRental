@@ -7,7 +7,7 @@ import './appointments.css';
 
 function Appointments() {
     const dispatch = useAppDispatch();
-    const { available, isLoading } = useAppSelector((state) => state.appointments);
+    const { available, isLoading, error } = useAppSelector((state) => state.appointments);
     const [selected, setSelected] = useState<AppointmentType | null>(null);
 
     useEffect(() => {
@@ -18,8 +18,14 @@ function Appointments() {
         <div className="appointments-page">
             <h2>תורים פנויים</h2>
             {isLoading && <p>טוען...</p>}
+            {error && (
+                <div role="alert">
+                    <p>{error}</p>
+                    <button className="apt-book-btn" onClick={() => dispatch(fetchAvailableAppointments())}>נסו שוב</button>
+                </div>
+            )}
             <div className="appointments-grid">
-                {available.length === 0 && !isLoading && (
+                {available.length === 0 && !isLoading && !error && (
                     <p className="no-appointments">אין תורים פנויים</p>
                 )}
                 {available.map(a => (

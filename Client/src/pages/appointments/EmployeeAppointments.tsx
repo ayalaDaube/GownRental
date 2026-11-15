@@ -7,7 +7,7 @@ import './appointments.css';
 
 function EmployeeAppointments() {
     const dispatch = useAppDispatch();
-    const { all, isLoading, notice } = useAppSelector((state) => state.appointments);
+    const { all, isLoading, notice, error } = useAppSelector((state) => state.appointments);
     const [searchId, setSearchId] = useState('');
 
     useEffect(() => {
@@ -46,7 +46,13 @@ function EmployeeAppointments() {
                 />
             </div>
             {isLoading && <p>טוען...</p>}
-            {sortedDates.length === 0 && !isLoading && <p className="no-appointments">אין תורים</p>}
+            {error && (
+                <div role="alert">
+                    <p>{error}</p>
+                    <button className="apt-book-btn" onClick={() => dispatch(fetchAllAppointments())}>נסו שוב</button>
+                </div>
+            )}
+            {sortedDates.length === 0 && !isLoading && !error && <p className="no-appointments">אין תורים</p>}
             {sortedDates.map(date => (
                 <div key={date} className="date-group">
                     <h3 className="date-group-title">{date}</h3>

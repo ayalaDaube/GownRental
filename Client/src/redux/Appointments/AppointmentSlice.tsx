@@ -72,13 +72,13 @@ const appointmentSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchAvailableAppointments.pending, (state) => { state.isLoading = true; })
-            .addCase(fetchAvailableAppointments.fulfilled, (state, action) => { state.isLoading = false; state.available = action.payload; })
-            .addCase(fetchAvailableAppointments.rejected, (state) => { state.isLoading = false; state.error = "Failed to load available appointments."; })
+            .addCase(fetchAvailableAppointments.pending, (state) => { state.isLoading = true; state.error = null; })
+            .addCase(fetchAvailableAppointments.fulfilled, (state, action) => { state.isLoading = false; state.error = null; state.available = action.payload; })
+            .addCase(fetchAvailableAppointments.rejected, (state) => { state.isLoading = false; state.error = "לא ניתן לטעון את התורים הפנויים כרגע. נסו שוב."; })
 
-            .addCase(fetchAllAppointments.pending, (state) => { state.isLoading = true; })
-            .addCase(fetchAllAppointments.fulfilled, (state, action) => { state.isLoading = false; state.all = action.payload; })
-            .addCase(fetchAllAppointments.rejected, (state) => { state.isLoading = false; state.error = "Failed to load appointments."; })
+            .addCase(fetchAllAppointments.pending, (state) => { state.isLoading = true; state.error = null; })
+            .addCase(fetchAllAppointments.fulfilled, (state, action) => { state.isLoading = false; state.error = null; state.all = action.payload; })
+            .addCase(fetchAllAppointments.rejected, (state) => { state.isLoading = false; state.error = "לא ניתן לטעון את התורים כרגע. נסו שוב."; })
 
             .addCase(fetchAppointmentsByDate.fulfilled, (state, action) => { state.all = action.payload; })
 
