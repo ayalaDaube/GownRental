@@ -170,7 +170,7 @@ Two GitHub Actions workflows run on every push and pull request (`.github/workfl
 - **Server:** build with warnings as errors, check that the migrations match the model, run the tests with coverage.
 - **Client:** `npm ci`, lint (no warnings), type check, tests with a coverage threshold, production build.
 
-Each pull request must be green before merging. To run a workflow by hand, open the **Actions** tab, choose the workflow and press **Run workflow**. The same checks can be run locally with the commands in the workflow files. To skip a run for a commit that changes nothing in the code (for example a typo in a document), put `[skip ci]` in the commit message.
+A repository setting (Settings, then Branches, then a rule for `main`) can require these checks to be green before a pull request is merged. To run a workflow by hand, open the **Actions** tab, choose the workflow and press **Run workflow**. The same checks can be run locally with the commands in the workflow files. To skip a run for a commit that changes nothing in the code (for example a typo in a document), put `[skip ci]` in the commit message.
 
 ## Status and roadmap
 
