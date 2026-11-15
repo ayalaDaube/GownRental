@@ -1,0 +1,15 @@
+# Text files are stored with LF line endings, whatever the operating system of the contributor is.
+* text=auto eol=lf
+
+# Visual Studio solution files must keep CRLF.
+*.sln text eol=crlf
+
+# Never touch binary files.
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.woff binary
+*.woff2 binary
+*.mdf binary
+*.ldf binary
