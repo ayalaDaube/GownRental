@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { logout } from '../../redux/Auth/AuthSlice';
+import { useEffect } from 'react';
+import { acknowledgeSignOut, logout } from '../../redux/Auth/AuthSlice';
 import './Home.css';
 
 function Home() {
   const dispatch = useAppDispatch();
   const isSignedIn = useAppSelector((state) => Boolean(state.auth.token));
+
+  // Arriving here ends the "just signed out" state, so protected addresses lead to the sign-in page again.
+  useEffect(() => {
+    dispatch(acknowledgeSignOut());
+  }, [dispatch]);
 
   const visitorCards = [
     {

@@ -10,8 +10,9 @@ import Gowns from '../pages/gowns/Gowns';
 import SecretaryHome from '../pages/secretary/SecretaryHome';
 import EmployeeAppointments from '../pages/appointments/EmployeeAppointments';
 import Appointments from '../pages/appointments/appointments';
+import NotFound from '../pages/notfound/NotFound';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
-import { logout } from '../redux/Auth/AuthSlice';
+import { sessionExpired } from '../redux/Auth/AuthSlice';
 import { AUTH_EXPIRED_EVENT } from '../services/http';
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
   // The server rejected our token (expired or invalid): sign out and ask the user to sign in again.
   useEffect(() => {
     const handleExpired = () => {
-      dispatch(logout());
+      dispatch(sessionExpired());
       navigate('/login', { replace: true });
     };
     window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired);
@@ -54,6 +55,9 @@ function App() {
           path="/employee/appointments"
           element={<ProtectedRoute><EmployeeAppointments /></ProtectedRoute>}
         />
+
+        {/* Any other address. */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

@@ -94,9 +94,9 @@ function GownModelDetails({ details, gownInfo }: GownModelDetailsProps) {
                                     <button className="gown-update-cancel-btn" onClick={() => setEditingId(null)}>Cancel</button>
                                 </>
                             ) : (
-                                <button className="gown-update-btn" onClick={() => handleEditClick(detail)}><FaEdit /></button>
+                                <button className="gown-update-btn" title="Edit size" aria-label="Edit size" onClick={() => handleEditClick(detail)}><FaEdit /></button>
                             )}
-                            <button className="gown-delete-btn" onClick={() => handleDelete(detail)}><FaTrashAlt /></button>
+                            <button className="gown-delete-btn" title="Delete size" aria-label="Delete size" onClick={() => handleDelete(detail)}><FaTrashAlt /></button>
                             <button
                                 className={`gown-cart-btn ${inCart ? 'gown-cart-btn--active' : ''} ${!detail.isAvailable ? 'gown-cart-btn--disabled' : ''}`}
                                 title={!detail.isActive ? 'Out of stock' : !detail.isAvailable ? 'Not available on that date' : inCart ? 'Remove from cart' : 'Add to cart'}

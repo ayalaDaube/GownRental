@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer, { login, logout } from './AuthSlice';
+import authReducer, { acknowledgeSignOut, login, logout, sessionExpired } from './AuthSlice';
 import http from '../../services/http';
 import { loadSession } from '../../auth/session';
 
@@ -73,4 +73,37 @@ test('signing out clears the token and the stored session', async () => {
 
   expect(store.getState().auth.token).toBeNull();
   expect(loadSession()).toBeNull();
+});
+
+test('choosing to sign out is remembered, so the next protected page leads home', () => {
+  const store = newStore();
+
+  store.dispatch(logout());
+
+  expect(store.getState().auth.justSignedOut).toBe(true);
+  store.dispatch(acknowledgeSignOut());
+  expect(store.getState().auth.justSignedOut).toBe(false);
+});
+
+test('a session that the server ended is not a chosen sign-out', async () => {
+  post.mockResolvedValue({ data: loginResponse });
+  const store = newStore();
+  await store.dispatch(login({ username: 'secretary', password: 'a-password' }));
+
+  store.dispatch(sessionExpired());
+
+  expect(store.getState().auth.token).toBeNull();
+  expect(store.getState().auth.justSignedOut).toBe(false);
+  expect(loadSession()).toBeNull();
+});
+
+test('signing in again clears the sign-out memory', async () => {
+  post.mockResolvedValue({ data: loginResponse });
+  const store = newStore();
+  store.dispatch(logout());
+
+  await store.dispatch(login({ username: 'secretary', password: 'a-password' }));
+
+  expect(store.getState().auth.justSignedOut).toBe(false);
+  expect(store.getState().auth.token).toBe('abc.def.ghi');
 });

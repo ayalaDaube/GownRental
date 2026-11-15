@@ -9,6 +9,8 @@ export interface AuthState {
   role: string | null;
   isLoading: boolean;
   error: string | null;
+  /** True right after the user chose to sign out, so protected pages send them home and not to the sign-in page. */
+  justSignedOut: boolean;
 }
 
 interface LoginResponse {
@@ -26,6 +28,7 @@ const initialState: AuthState = {
   role: stored?.role ?? null,
   isLoading: false,
   error: null,
+  justSignedOut: false,
 };
 
 export const login = createAsyncThunk<
@@ -53,12 +56,27 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    /** The user chose to sign out. */
     logout: (state) => {
       clearSession();
       state.token = null;
       state.username = null;
       state.role = null;
       state.error = null;
+      state.justSignedOut = true;
+    },
+    /** The server ended the session (it expired or was refused): the user must sign in again. */
+    sessionExpired: (state) => {
+      clearSession();
+      state.token = null;
+      state.username = null;
+      state.role = null;
+      state.error = null;
+      state.justSignedOut = false;
+    },
+    /** The home page was shown after signing out, so the next protected address leads to the sign-in page again. */
+    acknowledgeSignOut: (state) => {
+      state.justSignedOut = false;
     },
   },
   extraReducers: (builder) => {
@@ -66,6 +84,7 @@ const authSlice = createSlice({
       .addCase(login.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.justSignedOut = false;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -80,5 +99,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, sessionExpired, acknowledgeSignOut } = authSlice.actions;
 export default authSlice.reducer;

@@ -13,9 +13,14 @@ interface ProtectedRouteProps {
  */
 function ProtectedRoute({ children }: ProtectedRouteProps) {
   const token = useAppSelector((state) => state.auth.token);
+  const justSignedOut = useAppSelector((state) => state.auth.justSignedOut);
   const location = useLocation();
 
   if (!token) {
+    // Someone who just chose to sign out goes home; anyone else is asked to sign in and brought back here.
+    if (justSignedOut) {
+      return <Navigate to="/" replace />;
+    }
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   return children;
