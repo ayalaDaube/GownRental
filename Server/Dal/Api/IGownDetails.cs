@@ -9,7 +9,7 @@ namespace Dal.Api
         List<ModelDetails> GetByModel(int modelId);
         int GetNextId();
         void DeleteGownDetails(int id);
-        void createGownDetails(ModelDetails gd);
-        void updateGownDetails(ModelDetails gd);
+        void CreateGownDetails(ModelDetails gd);
+        void UpdateGownDetails(ModelDetails gd);
     }
 }

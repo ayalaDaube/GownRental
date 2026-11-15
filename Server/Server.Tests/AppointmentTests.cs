@@ -20,10 +20,10 @@ public class AppointmentTests
         return app;
     }
 
-    private static async Task<AppointmentFullDetaills> FirstFreeSlotAsync(HttpClient client) =>
-        (await client.GetFromJsonAsync<List<AppointmentFullDetaills>>("/api/Appointment/getAvailableAppointments"))!.First();
+    private static async Task<AppointmentFullDetails> FirstFreeSlotAsync(HttpClient client) =>
+        (await client.GetFromJsonAsync<List<AppointmentFullDetails>>("/api/Appointment/getAvailableAppointments"))!.First();
 
-    private static object Booking(AppointmentFullDetaills slot, string customerId = "C000001", int people = 2,
+    private static object Booking(AppointmentFullDetails slot, string customerId = "C000001", int people = 2,
         string? name = null, string? phone = null) => new
     {
         appointmentDate = slot.AppointmentDate.ToString("yyyy-MM-dd"),
@@ -105,7 +105,7 @@ public class AppointmentTests
 
         await visitor.PostAsJsonAsync("/api/Appointment", Booking(slot));
 
-        var free = (await visitor.GetFromJsonAsync<List<AppointmentFullDetaills>>("/api/Appointment/getAvailableAppointments"))!;
+        var free = (await visitor.GetFromJsonAsync<List<AppointmentFullDetails>>("/api/Appointment/getAvailableAppointments"))!;
         Assert.DoesNotContain(free, s => s.Id == slot.Id);
     }
 
@@ -136,7 +136,7 @@ public class AppointmentTests
             db.SaveChanges();
             return past.Id;
         });
-        var free = (await visitor.GetFromJsonAsync<List<AppointmentFullDetaills>>("/api/Appointment/getAvailableAppointments"))!;
+        var free = (await visitor.GetFromJsonAsync<List<AppointmentFullDetails>>("/api/Appointment/getAvailableAppointments"))!;
 
         var response = await visitor.PostAsJsonAsync("/api/Appointment", new
         {
@@ -279,11 +279,11 @@ public class AppointmentTests
     {
         using var app = NewApp();
         var staff = await app.SignedInClientAsync();
-        var all = (await staff.GetFromJsonAsync<List<AppointmentFullDetaills>>("/api/Appointment"))!;
+        var all = (await staff.GetFromJsonAsync<List<AppointmentFullDetails>>("/api/Appointment"))!;
         var booked = all.First(a => a.IsAvailable == false);
 
-        var day = (await staff.GetFromJsonAsync<List<AppointmentFullDetaills>>(
-            $"/api/Appointment/getByDate/{booked.AppointmentDate:yyyy-MM-dd}"))!;
+        var day = (await staff.GetFromJsonAsync<List<AppointmentFullDetails>>(
+            $"/api/Appointment/GetByDate/{booked.AppointmentDate:yyyy-MM-dd}"))!;
 
         Assert.Contains(all, a => a.IsAvailable == true);
         Assert.False(string.IsNullOrEmpty(booked.CustomerName));

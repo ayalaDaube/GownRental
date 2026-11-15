@@ -25,7 +25,7 @@ namespace Dal.Services
         }
 
 
-        public Rental createRental(Rental r)
+        public Rental CreateRental(Rental r)
         {
             this.datamanager.Rentals.Add(r);
             this.datamanager.SaveChanges();
@@ -53,7 +53,7 @@ namespace Dal.Services
             return datamanager.Rentals.Find(id);
         }
 
-        public void updateRental(Rental r)
+        public void UpdateRental(Rental r)
         {
             Rental oldRental = datamanager.Rentals.ToList().Find(x => x.Id == r.Id);
             if(oldRental == null)

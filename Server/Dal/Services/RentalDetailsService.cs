@@ -49,7 +49,7 @@ namespace Dal.Services
             return this.datamanager.RentalDetails.Any(d => ids.Contains(d.GownId));
         }
 
-        public void createRentalDetails(RentalDetails rd)
+        public void CreateRentalDetails(RentalDetails rd)
         {
             this.datamanager.RentalDetails.Add(rd);
             this.datamanager.SaveChanges();
@@ -80,7 +80,7 @@ namespace Dal.Services
             return rentalDetails;
         }
 
-        public void updateRentalDetails(RentalDetails rd)
+        public void UpdateRentalDetails(RentalDetails rd)
         {
             RentalDetails oldRentalDetails = datamanager.RentalDetails.ToList().Find(x => x.Id == rd.Id);
             if (oldRentalDetails == null)

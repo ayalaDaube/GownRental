@@ -43,12 +43,12 @@ public class RentalTests
         var response = await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var created = (await response.Content.ReadFromJsonAsync<RentalFullDetaills>())!;
-        Assert.Equal(11, created.rentalId);
-        Assert.Equal(44, created.size);
-        Assert.Equal(21, created.gownId);
-        Assert.Equal(EventDay, created.eventDate);
-        Assert.True((DateTime.Now - created.rentalDate).TotalMinutes < 5, "the booking time is set by the server");
+        var created = (await response.Content.ReadFromJsonAsync<RentalFullDetails>())!;
+        Assert.Equal(11, created.RentalId);
+        Assert.Equal(44, created.Size);
+        Assert.Equal(21, created.GownId);
+        Assert.Equal(EventDay, created.EventDate);
+        Assert.True((DateTime.Now - created.RentalDate).TotalMinutes < 5, "the booking time is set by the server");
         Assert.EndsWith("/api/Rentals/11", response.Headers.Location!.ToString());
     }
 
@@ -64,8 +64,8 @@ public class RentalTests
             rentalDate = "2001-01-01T00:00:00",
         });
 
-        var created = (await response.Content.ReadFromJsonAsync<RentalFullDetaills>())!;
-        Assert.True(created.rentalDate.Year >= DateTime.Now.Year);
+        var created = (await response.Content.ReadFromJsonAsync<RentalFullDetails>())!;
+        Assert.True(created.RentalDate.Year >= DateTime.Now.Year);
     }
 
     [Fact]
@@ -186,19 +186,19 @@ public class RentalTests
     {
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
-        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetaills>())!;
+        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetails>())!;
 
         var response = await client.PutAsJsonAsync("/api/Rentals", new
         {
-            created.rentalId, customerId = "C000001", gownId = 21,
+            created.RentalId, customerId = "C000001", gownId = 21,
             eventDate = EventDay.AddDays(5).ToString("yyyy-MM-dd"),
             rentalDate = "2001-01-01T00:00:00",
         });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var updated = (await response.Content.ReadFromJsonAsync<RentalFullDetaills>())!;
-        Assert.Equal(EventDay.AddDays(5), updated.eventDate);
-        Assert.Equal(created.rentalDate.Date, updated.rentalDate.Date);
+        var updated = (await response.Content.ReadFromJsonAsync<RentalFullDetails>())!;
+        Assert.Equal(EventDay.AddDays(5), updated.EventDate);
+        Assert.Equal(created.RentalDate.Date, updated.RentalDate.Date);
     }
 
     [Fact]
@@ -206,11 +206,11 @@ public class RentalTests
     {
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
-        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetaills>())!;
+        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetails>())!;
 
         var response = await client.PutAsJsonAsync("/api/Rentals", new
         {
-            created.rentalId, customerId = "C000009", gownId = 21, eventDate = EventDay.ToString("yyyy-MM-dd"),
+            created.RentalId, customerId = "C000009", gownId = 21, eventDate = EventDay.ToString("yyyy-MM-dd"),
         });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -222,15 +222,15 @@ public class RentalTests
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
         await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay));
-        var second = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay.AddDays(20), customerId: "C000002"))).Content.ReadFromJsonAsync<RentalFullDetaills>())!;
+        var second = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay.AddDays(20), customerId: "C000002"))).Content.ReadFromJsonAsync<RentalFullDetails>())!;
 
         var response = await client.PutAsJsonAsync("/api/Rentals", new
         {
-            second.rentalId, customerId = "C000002", gownId = 21, eventDate = EventDay.AddDays(2).ToString("yyyy-MM-dd"),
+            second.RentalId, customerId = "C000002", gownId = 21, eventDate = EventDay.AddDays(2).ToString("yyyy-MM-dd"),
         });
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-        Assert.Equal(EventDay.AddDays(20), app.Query(db => db.Rentals.Find(second.rentalId))!.EventDate);
+        Assert.Equal(EventDay.AddDays(20), app.Query(db => db.Rentals.Find(second.RentalId))!.EventDate);
     }
 
     [Fact]
@@ -238,11 +238,11 @@ public class RentalTests
     {
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
-        var past = (await client.GetFromJsonAsync<RentalFullDetaills>("/api/Rentals/8"))!;
+        var past = (await client.GetFromJsonAsync<RentalFullDetails>("/api/Rentals/8"))!;
 
         var response = await client.PutAsJsonAsync("/api/Rentals", new
         {
-            past.rentalId, customerId = "C000009", gownId = past.gownId, eventDate = past.eventDate.ToString("yyyy-MM-dd"),
+            past.RentalId, customerId = "C000009", gownId = past.GownId, eventDate = past.EventDate.ToString("yyyy-MM-dd"),
         });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -254,11 +254,11 @@ public class RentalTests
     {
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
-        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetaills>())!;
+        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetails>())!;
 
         var response = await client.PutAsJsonAsync("/api/Rentals", new
         {
-            created.rentalId, customerId = "C000001", gownId = 21, eventDate = Today.AddDays(-5).ToString("yyyy-MM-dd"),
+            created.RentalId, customerId = "C000001", gownId = 21, eventDate = Today.AddDays(-5).ToString("yyyy-MM-dd"),
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -269,10 +269,10 @@ public class RentalTests
     {
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
-        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetaills>())!;
+        var created = (await (await client.PostAsJsonAsync("/api/Rentals", Body(21, EventDay))).Content.ReadFromJsonAsync<RentalFullDetails>())!;
 
         var unknownRental = await client.PutAsJsonAsync("/api/Rentals", new { rentalId = 9999, customerId = "C000001", gownId = 21, eventDate = EventDay.ToString("yyyy-MM-dd") });
-        var unknownGown = await client.PutAsJsonAsync("/api/Rentals", new { created.rentalId, customerId = "C000001", gownId = 9999, eventDate = EventDay.ToString("yyyy-MM-dd") });
+        var unknownGown = await client.PutAsJsonAsync("/api/Rentals", new { created.RentalId, customerId = "C000001", gownId = 9999, eventDate = EventDay.ToString("yyyy-MM-dd") });
 
         Assert.Equal(HttpStatusCode.NotFound, unknownRental.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, unknownGown.StatusCode);
@@ -324,12 +324,12 @@ public class RentalTests
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
 
-        var renting = (await client.GetFromJsonAsync<List<RentalFullDetaills>>("/api/Rentals/renting"))!;
-        var returning = (await client.GetFromJsonAsync<List<RentalFullDetaills>>("/api/Rentals/returning"))!;
+        var renting = (await client.GetFromJsonAsync<List<RentalFullDetails>>("/api/Rentals/renting"))!;
+        var returning = (await client.GetFromJsonAsync<List<RentalFullDetails>>("/api/Rentals/returning"))!;
 
         Assert.Equal(2, renting.Count);
-        Assert.All(renting, r => Assert.Equal(Today.AddDays(3), r.eventDate));
+        Assert.All(renting, r => Assert.Equal(Today.AddDays(3), r.EventDate));
         Assert.Equal(2, returning.Count);
-        Assert.All(returning, r => Assert.Equal(Today.AddDays(-3), r.eventDate));
+        Assert.All(returning, r => Assert.Equal(Today.AddDays(-3), r.EventDate));
     }
 }

@@ -16,41 +16,41 @@ namespace Server.Controllers
         }
 
         [HttpGet]
-        public List<RentalFullDetaills> GetAllGownRentals()
+        public List<RentalFullDetails> GetAllRentals()
         {
             return bl.GetFullRentals();
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult<RentalFullDetaills> GetRental(int id)
+        public ActionResult<RentalFullDetails> GetRental(int id)
         {
             return bl.GetRentalById(id);
         }
 
         /// <summary>Rentals whose gowns come back to the shop today (events from three days ago).</summary>
         [HttpGet("returning")]
-        public List<RentalFullDetaills> returningCustomers()
+        public List<RentalFullDetails> GetReturningRentals()
         {
-            return bl.returningCustomers();
+            return bl.GetReturningRentals();
         }
 
         /// <summary>Rentals whose gowns customers pick up today (events in three days).</summary>
         [HttpGet("renting")]
-        public List<RentalFullDetaills> rentingCustomers()
+        public List<RentalFullDetails> GetPickupRentals()
         {
-            return bl.rentingCustomers();
+            return bl.GetPickupRentals();
         }
 
         /// <summary>Rents a gown. Answers 404 for an unknown gown or customer and 409 when the gown is not free.</summary>
         [HttpPost]
-        public ActionResult<RentalFullDetaills> Post([FromBody] RentalFullDetaills newRental)
+        public ActionResult<RentalFullDetails> Post([FromBody] RentalFullDetails newRental)
         {
             var created = bl.CreateRental(newRental);
-            return CreatedAtAction(nameof(GetRental), new { id = created.rentalId }, created);
+            return CreatedAtAction(nameof(GetRental), new { id = created.RentalId }, created);
         }
 
         [HttpPut]
-        public ActionResult<RentalFullDetaills> Put([FromBody] RentalFullDetaills updatedRental)
+        public ActionResult<RentalFullDetails> Put([FromBody] RentalFullDetails updatedRental)
         {
             return bl.UpdateRental(updatedRental);
         }

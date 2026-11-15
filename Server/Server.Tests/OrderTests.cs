@@ -47,8 +47,8 @@ public class OrderTests
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var result = (await response.Content.ReadFromJsonAsync<OrderResult>())!;
         Assert.Equal(3, result.Rentals.Count);
-        Assert.All(result.Rentals, r => Assert.Equal(EventDay, r.eventDate));
-        Assert.Equal(new[] { 20, 21, 22 }, result.Rentals.Select(r => r.gownId).ToArray());
+        Assert.All(result.Rentals, r => Assert.Equal(EventDay, r.EventDate));
+        Assert.Equal(new[] { 20, 21, 22 }, result.Rentals.Select(r => r.GownId).ToArray());
         Assert.Equal(before + 3, Rentals(app));
         Assert.Equal("C000001", result.CustomerId);
     }

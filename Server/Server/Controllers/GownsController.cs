@@ -17,60 +17,60 @@ namespace Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<ModelFullDetaills>> GetAllGowns()
+        public ActionResult<List<ModelFullDetails>> GetAllGowns()
         {
-            return Ok(bl.getFullGowns());
+            return Ok(bl.GetFullGowns());
         }
 
 
         [HttpGet("byDate")]
-        public ActionResult<List<ModelGrouped>> getByDate([FromQuery] DateOnly date)
+        public ActionResult<List<ModelGrouped>> GetByDate([FromQuery] DateOnly date)
         {
-            return Ok(bl.markingTheOccupieByDate(date));
+            return Ok(bl.GetGroupedGownsForDate(date));
         }
 
         [Route("groups")]
         [HttpGet]
         public ActionResult<List<ModelGrouped>> GetGroupedGowns()
         {
-            return Ok(bl.GetModelGroupeds());
+            return Ok(bl.GetGroupedGowns());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ModelFullDetaills> GetGownById(int id)
+        public ActionResult<ModelFullDetails> GetGownById(int id)
         {
-            var res = bl.getGownById(id);
+            var res = bl.GetGownById(id);
             if (res == null) return NotFound();
             return Ok(res);
         }
 
         /// <summary>Adds a new gown model with its first size, or a new size to the model given by modelId.</summary>
         [HttpPost]
-        public ActionResult<ModelFullDetaills> Post([FromBody] NewGownRequest request)
+        public ActionResult<ModelFullDetails> Post([FromBody] NewGownRequest request)
         {
-            var created = bl.createGown(request);
+            var created = bl.CreateGown(request);
             return CreatedAtAction(nameof(GetGownById), new { id = created.Id }, created);
         }
 
         /// <summary>Changes the size number, price or availability of one size.</summary>
         [HttpPut("{id:int}")]
-        public ActionResult<ModelFullDetaills> PutSize(int id, [FromBody] UpdateSizeRequest request)
+        public ActionResult<ModelFullDetails> PutSize(int id, [FromBody] UpdateSizeRequest request)
         {
-            return Ok(bl.updateGownSize(id, request));
+            return Ok(bl.UpdateGownSize(id, request));
         }
 
         /// <summary>Changes the name, color, description or image of a model (shared by all its sizes).</summary>
         [HttpPut("models/{modelId:int}")]
-        public ActionResult<ModelFullDetaills> PutModel(int modelId, [FromBody] UpdateModelRequest request)
+        public ActionResult<ModelFullDetails> PutModel(int modelId, [FromBody] UpdateModelRequest request)
         {
-            return Ok(bl.updateGownModel(modelId, request));
+            return Ok(bl.UpdateGownModel(modelId, request));
         }
 
         /// <summary>Deletes one size of a gown (and the model when it was the last size).</summary>
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            bl.deleteGown(id);
+            bl.DeleteGown(id);
             return NoContent();
         }
 
@@ -78,7 +78,7 @@ namespace Server.Controllers
         [HttpDelete("models/{modelId:int}")]
         public IActionResult DeleteModel(int modelId)
         {
-            bl.deleteGownModel(modelId);
+            bl.DeleteGownModel(modelId);
             return NoContent();
         }
     }

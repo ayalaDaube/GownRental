@@ -37,7 +37,7 @@ public class GownEditingTests
         });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var created = (await response.Content.ReadFromJsonAsync<ModelFullDetaills>())!;
+        var created = (await response.Content.ReadFromJsonAsync<ModelFullDetails>())!;
         Assert.Equal(16, created.ModelId);
         Assert.Equal(24, created.Id);
         Assert.Equal("Aurora Gown", created.Name);
@@ -53,8 +53,8 @@ public class GownEditingTests
         var client = await app.SignedInClientAsync();
         var body = new { name = "Twin", color = "Red", size = 40, price = 100 };
 
-        var first = (await (await client.PostAsJsonAsync("/api/Gowns", body)).Content.ReadFromJsonAsync<ModelFullDetaills>())!;
-        var second = (await (await client.PostAsJsonAsync("/api/Gowns", body)).Content.ReadFromJsonAsync<ModelFullDetaills>())!;
+        var first = (await (await client.PostAsJsonAsync("/api/Gowns", body)).Content.ReadFromJsonAsync<ModelFullDetails>())!;
+        var second = (await (await client.PostAsJsonAsync("/api/Gowns", body)).Content.ReadFromJsonAsync<ModelFullDetails>())!;
 
         Assert.NotEqual(first.Id, second.Id);
         Assert.NotEqual(first.ModelId, second.ModelId);
@@ -72,7 +72,7 @@ public class GownEditingTests
         });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var created = (await response.Content.ReadFromJsonAsync<ModelFullDetaills>())!;
+        var created = (await response.Content.ReadFromJsonAsync<ModelFullDetails>())!;
         Assert.Equal(1, created.ModelId);
         Assert.Equal("Simple Gown", created.Name);
         Assert.Equal(40, created.Size);

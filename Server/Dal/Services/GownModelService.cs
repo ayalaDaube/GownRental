@@ -12,7 +12,7 @@ namespace Dal.Services
             this.dataManager = dataManager;
         }
 
-        public void createGownModel(GownModel gm)
+        public void CreateGownModel(GownModel gm)
         {
             var existing = dataManager.GownModels.Find(gm.Id);
             if (existing != null)
@@ -54,7 +54,7 @@ namespace Dal.Services
             return dataManager.GownModels.ToList();
         }
 
-        public void updateGownModel(GownModel gm)
+        public void UpdateGownModel(GownModel gm)
         {
             var old = dataManager.GownModels.Find(gm.Id);
             if (old == null)

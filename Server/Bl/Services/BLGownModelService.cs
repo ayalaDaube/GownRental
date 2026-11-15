@@ -14,9 +14,9 @@ namespace Bl.Services
 {
     public class BLGownModelService : IBLGowns
     {
-        public IGownModel gownModel { get; }
-        public IGownDetails gownDetails { get; }
-        public IBLRentals rentals { get; }
+        private readonly IGownModel gownModels;
+        private readonly IGownDetails gownDetails;
+        private readonly IBLRentals rentals;
         private readonly IDal dal;
         private readonly IRentalDetails rentalDetails;
 
@@ -24,15 +24,15 @@ namespace Bl.Services
         {
             dal = gown;
             rentalDetails = gown.RentalDetails;
-            gownModel = gown.gownModel;
-            gownDetails = gown.gownDetail;
+            gownModels = gown.GownModels;
+            gownDetails = gown.GownDetails;
             rentals = new BLRentalService(gown);
         }
         /// <summary>
         /// Adds a gown: a new model with its first size, or one more size for an existing model.
         /// The ids are assigned here, never by the caller.
         /// </summary>
-        public ModelFullDetaills createGown(NewGownRequest request)
+        public ModelFullDetails CreateGown(NewGownRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 
@@ -41,7 +41,7 @@ namespace Bl.Services
                 int modelId;
                 if (request.ModelId is int existingModelId)
                 {
-                    if (gownModel.GetGownModelById(existingModelId) == null)
+                    if (gownModels.GetGownModelById(existingModelId) == null)
                     {
                         throw new NotFoundException($"Gown model {existingModelId} does not exist.");
                     }
@@ -62,8 +62,8 @@ namespace Bl.Services
                         throw new InvalidRequestException("A color is required for a new gown model.");
                     }
 
-                    modelId = gownModel.GetNextId();
-                    gownModel.createGownModel(new Dal.Models.GownModel
+                    modelId = gownModels.GetNextId();
+                    gownModels.CreateGownModel(new Dal.Models.GownModel
                     {
                         Id = modelId,
                         Name = request.Name.Trim(),
@@ -74,7 +74,7 @@ namespace Bl.Services
                 }
 
                 var newGownId = gownDetails.GetNextId();
-                gownDetails.createGownDetails(new Dal.Models.ModelDetails
+                gownDetails.CreateGownDetails(new Dal.Models.ModelDetails
                 {
                     GownId = newGownId,
                     ModelId = modelId,
@@ -85,13 +85,13 @@ namespace Bl.Services
                 return newGownId;
             });
 
-            return getGownById(gownId)!;
+            return GetGownById(gownId)!;
         }
 
         private static string? NullIfBlank(string? text) =>
             string.IsNullOrWhiteSpace(text) ? null : text.Trim();
         /// <summary>Deletes one size of a gown. The model is removed too once its last size is gone.</summary>
-        public void deleteGown(int gownId)
+        public void DeleteGown(int gownId)
         {
             dal.RunInTransaction(() =>
             {
@@ -108,17 +108,17 @@ namespace Bl.Services
 
                 if (!gownDetails.GetByModel(size.ModelId).Any())
                 {
-                    gownModel.DeleteGownModel(size.ModelId);
+                    gownModels.DeleteGownModel(size.ModelId);
                 }
             });
         }
 
         /// <summary>Deletes a model together with all of its sizes, unless one of them was ever rented.</summary>
-        public void deleteGownModel(int modelId)
+        public void DeleteGownModel(int modelId)
         {
             dal.RunInTransaction(() =>
             {
-                if (gownModel.GetGownModelById(modelId) == null)
+                if (gownModels.GetGownModelById(modelId) == null)
                 {
                     throw new NotFoundException($"Gown model {modelId} does not exist.");
                 }
@@ -134,15 +134,15 @@ namespace Bl.Services
                 {
                     gownDetails.DeleteGownDetails(size.GownId);
                 }
-                gownModel.DeleteGownModel(modelId);
+                gownModels.DeleteGownModel(modelId);
             });
         }
 
-        public List<ModelFullDetaills> getFullGowns()
+        public List<ModelFullDetails> GetFullGowns()
         {
-            return (from g in gownModel.GetGownModels()
+            return (from g in gownModels.GetGownModels()
                     join d in gownDetails.GetGownDetails() on g.Id equals d.ModelId
-                    select new ModelFullDetaills
+                    select new ModelFullDetails
                     {
                         Id = d.GownId,
                         Name = g.Name,
@@ -160,10 +160,10 @@ namespace Bl.Services
         /// The gowns grouped by model, with each size marked available or not for an event on the given date.
         /// A size is unavailable when it is out of the inventory or rented within the buffer days around the date.
         /// </summary>
-        public List<ModelGrouped> markingTheOccupieByDate(DateOnly date)
+        public List<ModelGrouped> GetGroupedGownsForDate(DateOnly date)
         {
             var rentedGownIds = rentals.GetRentedGownsByDate(date).ToHashSet();
-            var allGowns = GetModelGroupeds();
+            var allGowns = GetGroupedGowns();
             foreach (var size in allGowns.SelectMany(model => model.Details))
             {
                 size.IsAvailable = size.IsActive && !rentedGownIds.Contains(size.GownId);
@@ -171,12 +171,12 @@ namespace Bl.Services
             return allGowns;
         }
 
-        public ModelFullDetaills? getGownById(int id)
+        public ModelFullDetails? GetGownById(int id)
         {
-           return (from g in gownModel.GetGownModels()
+           return (from g in gownModels.GetGownModels()
                     join d in gownDetails.GetGownDetails() on g.Id equals d.ModelId
                     where d.GownId == id
-                    select new ModelFullDetaills
+                    select new ModelFullDetails
                     {
                         Id = d.GownId,
                         Name = g.Name,
@@ -191,7 +191,7 @@ namespace Bl.Services
         }
 
         /// <summary>Changes the size number, price or availability of one size of a gown.</summary>
-        public ModelFullDetaills updateGownSize(int gownId, UpdateSizeRequest request)
+        public ModelFullDetails UpdateGownSize(int gownId, UpdateSizeRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 
@@ -205,7 +205,7 @@ namespace Bl.Services
                     throw new ConflictException($"Gown model {current.ModelId} already has size {request.Size}.");
                 }
 
-                gownDetails.updateGownDetails(new Dal.Models.ModelDetails
+                gownDetails.UpdateGownDetails(new Dal.Models.ModelDetails
                 {
                     GownId = gownId,
                     ModelId = current.ModelId,
@@ -215,20 +215,20 @@ namespace Bl.Services
                 });
             });
 
-            return getGownById(gownId)!;
+            return GetGownById(gownId)!;
         }
 
         /// <summary>Changes the name, color, description or image shared by all sizes of a model.</summary>
-        public ModelFullDetaills updateGownModel(int modelId, UpdateModelRequest request)
+        public ModelFullDetails UpdateGownModel(int modelId, UpdateModelRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            if (gownModel.GetGownModelById(modelId) == null)
+            if (gownModels.GetGownModelById(modelId) == null)
             {
                 throw new NotFoundException($"Gown model {modelId} does not exist.");
             }
 
-            gownModel.updateGownModel(new Dal.Models.GownModel
+            gownModels.UpdateGownModel(new Dal.Models.GownModel
             {
                 Id = modelId,
                 Name = request.Name.Trim(),
@@ -239,13 +239,13 @@ namespace Bl.Services
 
             var firstSize = gownDetails.GetByModel(modelId).OrderBy(s => s.GownId).FirstOrDefault();
             return firstSize == null
-                ? new ModelFullDetaills { ModelId = modelId, Name = request.Name, Color = request.Color }
-                : getGownById(firstSize.GownId)!;
+                ? new ModelFullDetails { ModelId = modelId, Name = request.Name, Color = request.Color }
+                : GetGownById(firstSize.GownId)!;
         }
 
-        public List<ModelGrouped> GetModelGroupeds()
+        public List<ModelGrouped> GetGroupedGowns()
         {
-            var allGowns = getFullGowns();
+            var allGowns = GetFullGowns();
             var groups = allGowns.GroupBy(g => g.ModelId);
             var result = groups.Select(group => new ModelGrouped
             {

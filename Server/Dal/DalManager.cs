@@ -12,9 +12,9 @@ namespace Dal
 
         public IRentals Rentals { get; }
         
-        public IGownDetails gownDetail { get; }
+        public IGownDetails GownDetails { get; }
 
-        public IGownModel gownModel { get; }
+        public IGownModel GownModels { get; }
 
         public IAppointment Appointment { get; }
 
@@ -24,16 +24,16 @@ namespace Dal
 
         private readonly DataManager dataManager;
 
-        public DalManager(DataManager dataManager, IRentals rentals, IRentalDetails rentalDetails, IGownModel gownModel, IGownDetails gownDetail, IAppointment appointment, ICustomer customer, IUser user)
+        public DalManager(DataManager dataManager, IRentals rentals, IRentalDetails rentalDetails, IGownModel gownModels, IGownDetails gownDetails, IAppointment appointment, ICustomer customer, IUser user)
         {
             this.dataManager = dataManager;
             Rentals = rentals;
             RentalDetails = rentalDetails;
-            this.gownModel = gownModel;
-            this.gownDetail = gownDetail;
-            this.Appointment = appointment;
-            this.Customer = customer;
-            this.User = user;
+            GownModels = gownModels;
+            GownDetails = gownDetails;
+            Appointment = appointment;
+            Customer = customer;
+            User = user;
         }
 
         public void RunInTransaction(Action work)

@@ -27,7 +27,7 @@ namespace Bl.Services
         /// Books a slot. The slot must exist, lie in the future and still be free; a customer who is new is
         /// registered. All of it is saved together, so a refused booking changes nothing.
         /// </summary>
-        public BookingConfirmation Create(AppointmentFullDetaills request)
+        public BookingConfirmation Create(AppointmentFullDetails request)
         {
             if (request == null)
             {
@@ -88,30 +88,30 @@ namespace Bl.Services
             });
         }
 
-        public List<AppointmentFullDetaills> GetFullAppointments()
+        public List<AppointmentFullDetails> GetAllAppointments()
         {
             return ToDtos(appointments.GetAllAppointments());
         }
 
-        public AppointmentFullDetaills GetAppointmentId(int id)
+        public AppointmentFullDetails GetAppointmentById(int id)
         {
             var existing = appointments.GetAppointmentById(id)
                 ?? throw new NotFoundException($"Appointment {id} does not exist.");
             return ToDtos(new List<Appointment> { existing }).Single();
         }
 
-        public List<AppointmentFullDetaills> GetAppointmentDate(DateOnly date)
+        public List<AppointmentFullDetails> GetAppointmentsByDate(DateOnly date)
         {
             return ToDtos(appointments.GetAppointmentByDate(date));
         }
 
-        public List<AppointmentFullDetaills> GetAvailableAppointments()
+        public List<AppointmentFullDetails> GetAvailableAppointments()
         {
             // Only what a visitor needs to pick a time: no customer data, and nothing that already passed.
             return appointments.GetAllAppointments()
                 .Where(a => a.IsAvailable == true && IsInTheFuture(a))
                 .OrderBy(a => a.Date).ThenBy(a => a.Hour)
-                .Select(a => new AppointmentFullDetaills
+                .Select(a => new AppointmentFullDetails
                 {
                     Id = a.Id,
                     AppointmentDate = a.Date,
@@ -126,7 +126,7 @@ namespace Bl.Services
             return slot.Date.ToDateTime(slot.Hour) > DateTime.Now;
         }
 
-        private List<AppointmentFullDetaills> ToDtos(List<Appointment> slots)
+        private List<AppointmentFullDetails> ToDtos(List<Appointment> slots)
         {
             var byId = customers.GetAllCustomers().ToDictionary(c => c.Id);
             return slots
@@ -134,7 +134,7 @@ namespace Bl.Services
                 .Select(a =>
                 {
                     byId.TryGetValue(a.CustomerId ?? string.Empty, out var customer);
-                    return new AppointmentFullDetaills
+                    return new AppointmentFullDetails
                     {
                         Id = a.Id,
                         AppointmentDate = a.Date,

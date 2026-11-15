@@ -18,27 +18,27 @@ namespace Server.Controllers
 
         /// <summary>All appointment slots, booked and free, with the customer of each booking (staff only).</summary>
         [HttpGet]
-        public List<AppointmentFullDetaills> GetAllAppointments()
+        public List<AppointmentFullDetails> GetAllAppointments()
         {
-            return bl.GetFullAppointments();
+            return bl.GetAllAppointments();
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult<AppointmentFullDetaills> GetAppointmentByID(int id)
+        public ActionResult<AppointmentFullDetails> GetAppointmentById(int id)
         {
-            return bl.GetAppointmentId(id);
+            return bl.GetAppointmentById(id);
         }
 
-        [HttpGet("getByDate/{date}")]
-        public List<AppointmentFullDetaills> GetAppointmentByDate(DateOnly date)
+        [HttpGet("GetByDate/{date}")]
+        public List<AppointmentFullDetails> GetAppointmentByDate(DateOnly date)
         {
-            return bl.GetAppointmentDate(date);
+            return bl.GetAppointmentsByDate(date);
         }
 
         /// <summary>Public: the free slots that are still in the future, so a visitor can pick one.</summary>
         [AllowAnonymous]
         [HttpGet("getAvailableAppointments")]
-        public List<AppointmentFullDetaills> GetAvailableAppointments()
+        public List<AppointmentFullDetails> GetAvailableAppointments()
         {
             return bl.GetAvailableAppointments();
         }
@@ -49,7 +49,7 @@ namespace Server.Controllers
         /// </summary>
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult<BookingConfirmation> Post([FromBody] AppointmentFullDetaills newAppointment)
+        public ActionResult<BookingConfirmation> Post([FromBody] AppointmentFullDetails newAppointment)
         {
             var confirmation = bl.Create(newAppointment);
             return StatusCode(StatusCodes.Status201Created, confirmation);

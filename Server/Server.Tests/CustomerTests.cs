@@ -156,7 +156,7 @@ public class CustomerTests
     {
         using var app = NewApp();
         var visitor = app.CreateClient(); // not signed in
-        var slots = (await visitor.GetFromJsonAsync<List<AppointmentFullDetaills>>("/api/Appointment/getAvailableAppointments"))!;
+        var slots = (await visitor.GetFromJsonAsync<List<AppointmentFullDetails>>("/api/Appointment/getAvailableAppointments"))!;
         var slot = slots.First();
 
         var response = await visitor.PostAsJsonAsync("/api/Appointment", new
@@ -181,7 +181,7 @@ public class CustomerTests
     {
         using var app = NewApp();
         var visitor = app.CreateClient();
-        var slot = (await visitor.GetFromJsonAsync<List<AppointmentFullDetaills>>("/api/Appointment/getAvailableAppointments"))!.First();
+        var slot = (await visitor.GetFromJsonAsync<List<AppointmentFullDetails>>("/api/Appointment/getAvailableAppointments"))!.First();
 
         var response = await visitor.PostAsJsonAsync("/api/Appointment", new
         {

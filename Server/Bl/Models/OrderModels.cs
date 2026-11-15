@@ -27,6 +27,6 @@ namespace Bl.Models
         public DateOnly EventDate { get; set; }
 
         /// <summary>One rental per gown in the order.</summary>
-        public List<RentalFullDetaills> Rentals { get; set; } = new();
+        public List<RentalFullDetails> Rentals { get; set; } = new();
     }
 }

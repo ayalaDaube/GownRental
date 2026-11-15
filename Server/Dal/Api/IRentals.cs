@@ -13,7 +13,7 @@ namespace Dal.Api
         List<Rental> GetRentals();
         Rental? GetRentalById(int id);
         void DeleteRental(int id);
-        Rental createRental(Rental r);
-        void updateRental(Rental r);
+        Rental CreateRental(Rental r);
+        void UpdateRental(Rental r);
     }
 }

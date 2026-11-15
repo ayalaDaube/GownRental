@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bl.Models
 {
-    public class ModelFullDetaills
+    public class ModelFullDetails
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

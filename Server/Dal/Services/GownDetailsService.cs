@@ -12,7 +12,7 @@ namespace Dal.Services
             this.dataManager = dataManager;
         }
 
-        public void createGownDetails(ModelDetails gd)
+        public void CreateGownDetails(ModelDetails gd)
         {
             var model = dataManager.GownModels.Find(gd.ModelId);
             if (model == null)
@@ -53,7 +53,7 @@ namespace Dal.Services
             return dataManager.ModelDetails.Where(d => d.ModelId == modelId).ToList();
         }
 
-        public void updateGownDetails(ModelDetails gd)
+        public void UpdateGownDetails(ModelDetails gd)
         {
             var old = dataManager.ModelDetails.Find(gd.GownId);
             if (old == null)

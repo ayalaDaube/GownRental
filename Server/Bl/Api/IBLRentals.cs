@@ -9,13 +9,13 @@ namespace Bl.Api
 {
     public interface IBLRentals
     {
-        RentalFullDetaills CreateRental(RentalFullDetaills rental);
-        List<RentalFullDetaills> GetFullRentals();
-        RentalFullDetaills GetRentalById(int id);
-        RentalFullDetaills UpdateRental(RentalFullDetaills rental);
+        RentalFullDetails CreateRental(RentalFullDetails rental);
+        List<RentalFullDetails> GetFullRentals();
+        RentalFullDetails GetRentalById(int id);
+        RentalFullDetails UpdateRental(RentalFullDetails rental);
         void DeleteRental(int id);
-        List<RentalFullDetaills> returningCustomers();
-        List<RentalFullDetaills> rentingCustomers();
+        List<RentalFullDetails> GetReturningRentals();
+        List<RentalFullDetails> GetPickupRentals();
         
         List<int> GetRentedGownsByDate(DateOnly date);
 

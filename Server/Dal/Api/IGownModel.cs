@@ -8,7 +8,7 @@ namespace Dal.Api
         GownModel? GetGownModelById(int id);
         int GetNextId();
         void DeleteGownModel(int id);
-        void createGownModel(GownModel gm);
-        void updateGownModel(GownModel gm);
+        void CreateGownModel(GownModel gm);
+        void UpdateGownModel(GownModel gm);
     }
 }

@@ -17,7 +17,7 @@ namespace Dal.Api
         DateOnly? GetConflictingEventDate(int gownId, DateOnly rangeStart, DateOnly rangeEnd, int? ignoreRentalId);
         bool ExistsForAnyGown(IEnumerable<int> gownIds);
         void DeleteRentalDetails(int id);
-        void createRentalDetails(RentalDetails rd);
-        void updateRentalDetails(RentalDetails rd);
+        void CreateRentalDetails(RentalDetails rd);
+        void UpdateRentalDetails(RentalDetails rd);
     }
 }

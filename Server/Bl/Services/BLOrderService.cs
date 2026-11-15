@@ -41,20 +41,20 @@ namespace Bl.Services
             return dal.RunInTransaction(() =>
             {
                 var created = request.GownIds
-                    .Select(gownId => rentals.CreateRental(new RentalFullDetaills
+                    .Select(gownId => rentals.CreateRental(new RentalFullDetails
                     {
-                        customerId = request.CustomerId,
-                        customerName = request.CustomerName,
-                        customerPhone = request.CustomerPhone,
-                        customerEmail = request.CustomerEmail,
-                        eventDate = request.EventDate,
-                        gownId = gownId,
+                        CustomerId = request.CustomerId,
+                        CustomerName = request.CustomerName,
+                        CustomerPhone = request.CustomerPhone,
+                        CustomerEmail = request.CustomerEmail,
+                        EventDate = request.EventDate,
+                        GownId = gownId,
                     }))
                     .ToList();
 
                 return new OrderResult
                 {
-                    CustomerId = created[0].customerId,
+                    CustomerId = created[0].CustomerId,
                     EventDate = request.EventDate,
                     Rentals = created,
                 };
