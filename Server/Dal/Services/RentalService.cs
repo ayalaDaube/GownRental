@@ -19,9 +19,6 @@ namespace Dal.Services
         {
             this.datamanager = datamanager;
         }
-        public RentalService() { }
-        public RentalService(string name) { }
-
         public List<Rental> GetRentals()
         {
             return this.datamanager.Rentals.AsNoTracking().ToList();
@@ -70,9 +67,5 @@ namespace Dal.Services
 
         }
 
-        public Rental GetRental(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

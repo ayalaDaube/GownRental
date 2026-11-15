@@ -16,9 +16,6 @@ namespace Dal.Services
         {
             this.datamanager = datamanager;
         }
-        public RentalDetailsService() { }
-        public RentalDetailsService(string name) { }
-
         public List<RentalDetails> GetRentalDetails()
         {
             return this.datamanager.RentalDetails.AsNoTracking().ToList();
