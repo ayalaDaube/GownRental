@@ -69,7 +69,7 @@ test('cancelling reports success, and a refusal shows a message that can be dism
   const store = newStore();
 
   await store.dispatch(deleteAppointmentThunk(4));
-  expect(store.getState().appointments.notice).toEqual({ type: 'success', text: 'The appointment was cancelled.' });
+  expect(store.getState().appointments.notice).toEqual({ type: 'success', text: 'התור בוטל.' });
 
   await store.dispatch(deleteAppointmentThunk(5));
   expect(store.getState().appointments.notice).toEqual({ type: 'error', text: 'Appointment 5 is not booked.' });

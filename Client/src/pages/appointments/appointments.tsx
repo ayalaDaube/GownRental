@@ -15,7 +15,7 @@ function Appointments() {
     }, [dispatch]);
 
     return (
-        <div className="appointments-page">
+        <div className="appointments-page" dir="rtl" lang="he" data-testid="appointments-page">
             <h2>תורים פנויים</h2>
             {isLoading && <p>טוען...</p>}
             {error && (

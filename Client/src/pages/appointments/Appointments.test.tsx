@@ -44,6 +44,14 @@ describe('booking an appointment as a visitor', () => {
     expect(screen.getAllByRole('button', { name: 'הזמן תור' })).toHaveLength(2);
   });
 
+  test('the Hebrew pages are laid out from right to left', async () => {
+    renderWithApp(<Appointments />, { route: '/appointments' });
+    await screen.findByText('09:00:00');
+
+    expect(screen.getByTestId('appointments-page')).toHaveAttribute('dir', 'rtl');
+    expect(screen.getByTestId('appointments-page')).toHaveAttribute('lang', 'he');
+  });
+
   test('when there are no free slots the page says so', async () => {
     loadFree.mockResolvedValue([]);
     renderWithApp(<Appointments />, { route: '/appointments' });
@@ -218,7 +226,7 @@ describe('the staff view of the appointments', () => {
     userEvent.click(screen.getByRole('button', { name: 'בטל' }));
 
     await waitFor(() => expect(cancel).toHaveBeenCalledWith(5));
-    expect(await screen.findByRole('status')).toHaveTextContent('The appointment was cancelled.');
+    expect(await screen.findByRole('status')).toHaveTextContent('התור בוטל.');
     await waitFor(() => expect(screen.queryByText('Grace Lee')).not.toBeInTheDocument());
     expect(screen.getAllByText('פנוי')).toHaveLength(4);
   });
@@ -241,6 +249,13 @@ describe('the staff view of the appointments', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Appointment 5 is not booked.');
     expect(screen.getByText('Grace Lee')).toBeInTheDocument();
+  });
+
+  test('the staff appointments page is laid out from right to left too', async () => {
+    renderWithApp(<EmployeeAppointments />, { route: '/employee/appointments', preloadedState: signedInState });
+    await screen.findByText('אין תורים');
+
+    expect(screen.getByTestId('appointments-page')).toHaveAttribute('dir', 'rtl');
   });
 
   test('with no appointments the page says so, and a load failure is not shown as an empty day', async () => {

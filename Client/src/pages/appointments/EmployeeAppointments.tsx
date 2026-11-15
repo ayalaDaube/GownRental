@@ -35,7 +35,7 @@ function EmployeeAppointments() {
     const sortedDates = Object.keys(grouped).sort();
 
     return (
-        <div className="appointments-page">
+        <div className="appointments-page" dir="rtl" lang="he" data-testid="appointments-page">
             <h2>ניהול תורים</h2>
             {notice && <Notice type={notice.type} text={notice.text} onClose={() => dispatch(dismissNotice())} />}
             <div className="employee-filters">

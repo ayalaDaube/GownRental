@@ -45,7 +45,7 @@ export const bookAppointmentThunk = createAsyncThunk<number, { slotId: number; b
             await bookAppointmentApi(booking);
             return slotId;
         } catch (error) {
-            return rejectWithValue(getApiErrorMessage(error, 'Could not book the appointment.'));
+            return rejectWithValue(getApiErrorMessage(error, 'לא ניתן היה לקבוע את התור. נסו שוב.'));
         }
     }
 );
@@ -57,7 +57,7 @@ export const deleteAppointmentThunk = createAsyncThunk<number, number, { rejectV
             await deleteAppointmentApi(id);
             return id;
         } catch (error) {
-            return rejectWithValue(getApiErrorMessage(error, 'Could not cancel the appointment.'));
+            return rejectWithValue(getApiErrorMessage(error, 'לא ניתן היה לבטל את התור. נסו שוב.'));
         }
     }
 );
@@ -88,10 +88,10 @@ const appointmentSlice = createSlice({
 
             // A cancelled slot is not removed: it stays in the list as a free slot, so reload the list afterwards.
             .addCase(deleteAppointmentThunk.fulfilled, (state) => {
-                state.notice = { type: 'success', text: 'The appointment was cancelled.' };
+                state.notice = { type: 'success', text: 'התור בוטל.' };
             })
             .addCase(deleteAppointmentThunk.rejected, (state, action) => {
-                state.notice = { type: 'error', text: action.payload ?? 'Could not cancel the appointment.' };
+                state.notice = { type: 'error', text: action.payload ?? 'לא ניתן היה לבטל את התור. נסו שוב.' };
             });
     },
 });
