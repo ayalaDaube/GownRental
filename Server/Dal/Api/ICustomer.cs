@@ -11,6 +11,7 @@ namespace Dal.Api
     {
         List<Customer> GetAllCustomers();
         bool Exists(string id);
+        List<Customer> GetByIds(IEnumerable<string> ids);
         Customer? FindById(string id);
         Customer GetCustomerById(string id);
         void DeleteCustomer(string id);

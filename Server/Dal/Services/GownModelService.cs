@@ -1,5 +1,6 @@
 using Dal.Api;
 using Dal.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dal.Services
 {
@@ -51,7 +52,7 @@ namespace Dal.Services
 
         public List<GownModel> GetGownModels()
         {
-            return dataManager.GownModels.ToList();
+            return dataManager.GownModels.AsNoTracking().ToList();
         }
 
         public void UpdateGownModel(GownModel gm)

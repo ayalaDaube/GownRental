@@ -108,9 +108,8 @@ namespace Bl.Services
         public List<AppointmentFullDetails> GetAvailableAppointments()
         {
             // Only what a visitor needs to pick a time: no customer data, and nothing that already passed.
-            return appointments.GetAllAppointments()
-                .Where(a => a.IsAvailable == true && IsInTheFuture(a))
-                .OrderBy(a => a.Date).ThenBy(a => a.Hour)
+            var now = DateTime.Now;
+            return appointments.GetFreeSlotsFrom(DateOnly.FromDateTime(now), TimeOnly.FromDateTime(now))
                 .Select(a => new AppointmentFullDetails
                 {
                     Id = a.Id,
@@ -128,7 +127,8 @@ namespace Bl.Services
 
         private List<AppointmentFullDetails> ToDtos(List<Appointment> slots)
         {
-            var byId = customers.GetAllCustomers().ToDictionary(c => c.Id);
+            var customerIds = slots.Where(a => a.CustomerId != null).Select(a => a.CustomerId!);
+            var byId = customers.GetByIds(customerIds).ToDictionary(c => c.Id);
             return slots
                 .OrderBy(a => a.Date).ThenBy(a => a.Hour)
                 .Select(a =>

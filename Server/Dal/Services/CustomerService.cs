@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dal.Api;
 using Dal.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dal.Services
 {
@@ -33,7 +34,7 @@ namespace Dal.Services
         {
             try
             {
-                Customer customer = datamanager.Customers.ToList().Find(x => x.Id == id);
+                var customer = datamanager.Customers.Find(id);
                 if (customer != null)
                 {
                     this.datamanager.Customers.Remove(customer);
@@ -51,6 +52,12 @@ namespace Dal.Services
             return this.datamanager.Customers.Find(id);
         }
 
+        public List<Customer> GetByIds(IEnumerable<string> ids)
+        {
+            var wanted = ids.Distinct().ToList();
+            return this.datamanager.Customers.AsNoTracking().Where(c => wanted.Contains(c.Id)).ToList();
+        }
+
         public bool Exists(string id)
         {
             return this.datamanager.Customers.Any(c => c.Id == id);
@@ -63,7 +70,7 @@ namespace Dal.Services
 
         public Customer GetCustomerById(string id)
         {
-            Customer customer = datamanager.Customers.ToList().Find(x => x.Id == id);
+            var customer = datamanager.Customers.Find(id);
             if (customer == null)
             {
                 throw new ArgumentNullException("This customer doesn't exist");
@@ -76,7 +83,7 @@ namespace Dal.Services
             if (c == null) throw new ArgumentNullException(nameof(c));
             try
             {
-                Customer old = datamanager.Customers.ToList().Find(x => x.Id == c.Id);
+                var old = datamanager.Customers.Find(c.Id);
                 if (old == null)
                 {
                     throw new ArgumentNullException("this customer does not exist. you can't update it ");

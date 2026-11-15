@@ -1,51 +1,38 @@
-﻿using Dal.Models;
 using Dal.Api;
+using Dal.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
-using System.ComponentModel.DataAnnotations;
 
 namespace Dal.Services
 {
     public class RentalService : IRentals
     {
-        DataManager datamanager;
+        private readonly DataManager datamanager;
+
         public RentalService(DataManager datamanager)
         {
             this.datamanager = datamanager;
         }
+
         public List<Rental> GetRentals()
         {
-            return this.datamanager.Rentals.AsNoTracking().ToList();
+            return datamanager.Rentals.AsNoTracking().ToList();
         }
-
 
         public Rental CreateRental(Rental r)
         {
-            this.datamanager.Rentals.Add(r);
-            this.datamanager.SaveChanges();
+            datamanager.Rentals.Add(r);
+            datamanager.SaveChanges();
             return r;
         }
 
         public void DeleteRental(int id)
         {
-            Rental rental = datamanager.Rentals.ToList().Find(x =>
-            {
-                ArgumentNullException.ThrowIfNull(x);
-                return x.Id == id;
-            });
+            var rental = datamanager.Rentals.Find(id);
             if (rental != null)
             {
-               this.datamanager.Rentals.Remove(rental);
-               this.datamanager.SaveChanges();
-
+                datamanager.Rentals.Remove(rental);
+                datamanager.SaveChanges();
             }
-
         }
 
         public Rental? GetRentalById(int id)
@@ -55,17 +42,42 @@ namespace Dal.Services
 
         public void UpdateRental(Rental r)
         {
-            Rental oldRental = datamanager.Rentals.ToList().Find(x => x.Id == r.Id);
-            if(oldRental == null)
-            {
-                throw new ArgumentNullException("this rental doesn't exist. you can't update it.");
-            }
+            var oldRental = datamanager.Rentals.Find(r.Id)
+                ?? throw new ArgumentNullException(nameof(r), "this rental doesn't exist. you can't update it.");
             oldRental.RentalDate = r.RentalDate;
             oldRental.EventDate = r.EventDate;
             oldRental.CustomerId = r.CustomerId;
-            this.datamanager.SaveChanges();
-
+            datamanager.SaveChanges();
         }
 
+        public List<RentalWithDetails> GetRentalsWithDetails(int? rentalId = null, DateOnly? eventDate = null)
+        {
+            var query = datamanager.RentalDetails
+                .AsNoTracking()
+                .Join(datamanager.Rentals, d => d.RentalId, r => r.Id, (d, r) => new { Rental = r, Details = d });
+
+            if (rentalId != null)
+            {
+                query = query.Where(x => x.Rental.Id == rentalId);
+            }
+            if (eventDate != null)
+            {
+                query = query.Where(x => x.Rental.EventDate == eventDate);
+            }
+
+            return query
+                .OrderBy(x => x.Rental.Id)
+                .AsEnumerable()
+                .Select(x => new RentalWithDetails(x.Rental, x.Details))
+                .ToList();
+        }
+
+        public List<int> GetRentedGownIds(DateOnly rangeStart, DateOnly rangeEnd)
+        {
+            return (from d in datamanager.RentalDetails
+                    join r in datamanager.Rentals on d.RentalId equals r.Id
+                    where r.EventDate >= rangeStart && r.EventDate <= rangeEnd
+                    select d.GownId).Distinct().ToList();
+        }
     }
 }

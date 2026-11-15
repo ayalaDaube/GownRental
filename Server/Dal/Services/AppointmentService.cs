@@ -1,5 +1,6 @@
 ﻿using Dal.Api;
 using Dal.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,12 +55,21 @@ namespace Dal.Services
 
         public List<Appointment> GetAllAppointments()
         {
-            return this.datamanager.Appointments.ToList();
+            return this.datamanager.Appointments.AsNoTracking().ToList();
+        }
+
+        public List<Appointment> GetFreeSlotsFrom(DateOnly date, TimeOnly time)
+        {
+            return this.datamanager.Appointments
+                .AsNoTracking()
+                .Where(a => a.IsAvailable == true && (a.Date > date || (a.Date == date && a.Hour > time)))
+                .OrderBy(a => a.Date).ThenBy(a => a.Hour)
+                .ToList();
         }
 
         public List<Appointment> GetAppointmentByDate(DateOnly date)
         {
-            return this.datamanager.Appointments.Where(x => x.Date == date).ToList();
+            return this.datamanager.Appointments.AsNoTracking().Where(x => x.Date == date).ToList();
         }
 
         public Appointment? GetAppointmentById(int id)

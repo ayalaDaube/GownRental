@@ -10,6 +10,9 @@ namespace Dal.Api
     public interface IAppointment
     {
         List<Appointment> GetAllAppointments();
+
+        /// <summary>The free slots from the given moment on, ordered by time, filtered by the database.</summary>
+        List<Appointment> GetFreeSlotsFrom(DateOnly date, TimeOnly time);
         List<Appointment> GetAppointmentByDate(DateOnly date);
         Appointment? GetAppointmentById(int id);
         Appointment? GetByDateAndHour(DateOnly date, TimeOnly hour);

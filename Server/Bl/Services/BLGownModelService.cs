@@ -173,21 +173,25 @@ namespace Bl.Services
 
         public ModelFullDetails? GetGownById(int id)
         {
-           return (from g in gownModels.GetGownModels()
-                    join d in gownDetails.GetGownDetails() on g.Id equals d.ModelId
-                    where d.GownId == id
-                    select new ModelFullDetails
-                    {
-                        Id = d.GownId,
-                        Name = g.Name,
-                        Color = g.Color,
-                        Description = g.Description,
-                        ImageUrl = g.ImageUrl,
-                        IsActive = d.IsActive,
-                        Price = d.Price,
-                        Size = d.Size,
-                        ModelId = g.Id,
-                    }).FirstOrDefault();
+            var size = gownDetails.GetGownDetailsById(id);
+            var model = size == null ? null : gownModels.GetGownModelById(size.ModelId);
+            if (size == null || model == null)
+            {
+                return null;
+            }
+
+            return new ModelFullDetails
+            {
+                Id = size.GownId,
+                Name = model.Name ?? string.Empty,
+                Color = model.Color,
+                Description = model.Description,
+                ImageUrl = model.ImageUrl,
+                IsActive = size.IsActive,
+                Price = size.Price,
+                Size = size.Size,
+                ModelId = model.Id,
+            };
         }
 
         /// <summary>Changes the size number, price or availability of one size of a gown.</summary>

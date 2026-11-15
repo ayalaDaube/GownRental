@@ -65,7 +65,7 @@ namespace Bl.Services
 
         public RentalFullDetails GetRentalById(int id)
         {
-            return BuildRentals().FirstOrDefault(r => r.RentalId == id)
+            return BuildRentals(rentalId: id).FirstOrDefault()
                    ?? throw new NotFoundException($"Rental {id} does not exist.");
         }
 
@@ -129,14 +129,14 @@ namespace Bl.Services
         public List<RentalFullDetails> GetReturningRentals()
         {
             var day = Today.AddDays(-RentalRules.BufferDays);
-            return BuildRentals().Where(r => r.EventDate == day).ToList();
+            return BuildRentals(eventDate: day).ToList();
         }
 
         /// <summary>Rentals whose event is in the buffer days: the gowns that customers pick up now.</summary>
         public List<RentalFullDetails> GetPickupRentals()
         {
             var day = Today.AddDays(RentalRules.BufferDays);
-            return BuildRentals().Where(r => r.EventDate == day).ToList();
+            return BuildRentals(eventDate: day).ToList();
         }
 
         /// <summary>The ids of the gowns that are rented within the buffer days around the date.</summary>
@@ -150,10 +150,7 @@ namespace Bl.Services
             var rangeStart = date.AddDays(-RentalRules.BufferDays);
             var rangeEnd = date.AddDays(RentalRules.BufferDays);
 
-            return (from r in rentals.GetRentals()
-                    join rd in rentalDetails.GetRentalDetails() on r.Id equals rd.RentalId
-                    where r.EventDate >= rangeStart && r.EventDate <= rangeEnd
-                    select rd.GownId).Distinct().ToList();
+            return rentals.GetRentedGownIds(rangeStart, rangeEnd);
         }
 
         /// <summary>Checks the rules shared by creating and updating a rental and returns the gown that is rented.</summary>
@@ -199,19 +196,19 @@ namespace Bl.Services
             return gown;
         }
 
-        private IEnumerable<RentalFullDetails> BuildRentals()
+        /// <summary>The rentals with their gown, read with the filter applied by the database.</summary>
+        private IEnumerable<RentalFullDetails> BuildRentals(int? rentalId = null, DateOnly? eventDate = null)
         {
-            return from r in rentals.GetRentals()
-                   join rd in rentalDetails.GetRentalDetails() on r.Id equals rd.RentalId
-                   select new RentalFullDetails
-                   {
-                       CustomerId = r.CustomerId,
-                       RentalDate = r.RentalDate,
-                       EventDate = r.EventDate,
-                       RentalId = rd.RentalId,
-                       Size = rd.Size,
-                       GownId = rd.GownId,
-                   };
+            return rentals.GetRentalsWithDetails(rentalId, eventDate)
+                .Select(x => new RentalFullDetails
+                {
+                    CustomerId = x.Rental.CustomerId,
+                    RentalDate = x.Rental.RentalDate,
+                    EventDate = x.Rental.EventDate,
+                    RentalId = x.Rental.Id,
+                    Size = x.Details.Size,
+                    GownId = x.Details.GownId,
+                });
         }
     }
 }
