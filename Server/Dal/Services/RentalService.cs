@@ -13,11 +13,6 @@ namespace Dal.Services
             this.datamanager = datamanager;
         }
 
-        public List<Rental> GetRentals()
-        {
-            return datamanager.Rentals.AsNoTracking().ToList();
-        }
-
         public Rental CreateRental(Rental r)
         {
             datamanager.Rentals.Add(r);

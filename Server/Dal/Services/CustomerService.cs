@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Dal.Api;
 using Dal.Models;
 using Microsoft.EntityFrameworkCore;
@@ -11,94 +6,29 @@ namespace Dal.Services
 {
     public class CustomerService : ICustomer
     {
-        DataManager datamanager;
+        private readonly DataManager datamanager;
+
         public CustomerService(DataManager datamanager)
         {
             this.datamanager = datamanager;
         }
-        public void CreateCustomer(Customer c)
-        {
-            if (c == null) throw new ArgumentNullException(nameof(c));                  
-            try
-            {
-                this.datamanager.Customers.Add(c);
-                this.datamanager.SaveChanges(); 
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Failed to create customer.", ex);
-            }
-        }
 
-        public void DeleteCustomer(string id)
+        public bool Exists(string id)
         {
-            try
-            {
-                var customer = datamanager.Customers.Find(id);
-                if (customer != null)
-                {
-                    this.datamanager.Customers.Remove(customer);
-                    this.datamanager.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Failed to delete customer '{id}'.", ex);
-            }
-        }
-
-        public Customer? FindById(string id)
-        {
-            return this.datamanager.Customers.Find(id);
+            return datamanager.Customers.Any(c => c.Id == id);
         }
 
         public List<Customer> GetByIds(IEnumerable<string> ids)
         {
             var wanted = ids.Distinct().ToList();
-            return this.datamanager.Customers.AsNoTracking().Where(c => wanted.Contains(c.Id)).ToList();
+            return datamanager.Customers.AsNoTracking().Where(c => wanted.Contains(c.Id)).ToList();
         }
 
-        public bool Exists(string id)
+        public void CreateCustomer(Customer c)
         {
-            return this.datamanager.Customers.Any(c => c.Id == id);
-        }
-
-        public List<Customer> GetAllCustomers()
-        {
-            return this.datamanager.Customers.ToList();
-        }
-
-        public Customer GetCustomerById(string id)
-        {
-            var customer = datamanager.Customers.Find(id);
-            if (customer == null)
-            {
-                throw new ArgumentNullException("This customer doesn't exist");
-            }
-            return customer;
-        }
-
-        public void UpdateCustomer(Customer c)
-        {
-            if (c == null) throw new ArgumentNullException(nameof(c));
-            try
-            {
-                var old = datamanager.Customers.Find(c.Id);
-                if (old == null)
-                {
-                    throw new ArgumentNullException("this customer does not exist. you can't update it ");
-                }
-
-                old.Name = c.Name;
-                old.Phone = c.Phone;
-                old.Email = c.Email;
-
-                this.datamanager.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Failed to update customer '{c?.Id}'.", ex);
-            }
+            ArgumentNullException.ThrowIfNull(c);
+            datamanager.Customers.Add(c);
+            datamanager.SaveChanges();
         }
     }
 }

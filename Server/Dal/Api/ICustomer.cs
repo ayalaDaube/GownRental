@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Dal.Models;
 
 namespace Dal.Api
 {
     public interface ICustomer
     {
-        List<Customer> GetAllCustomers();
         bool Exists(string id);
         List<Customer> GetByIds(IEnumerable<string> ids);
-        Customer? FindById(string id);
-        Customer GetCustomerById(string id);
-        void DeleteCustomer(string id);
         void CreateCustomer(Customer c);
-        void UpdateCustomer(Customer c);
     }
 }

@@ -13,11 +13,6 @@ namespace Dal.Services
             this.datamanager = datamanager;
         }
 
-        public List<RentalDetails> GetRentalDetails()
-        {
-            return datamanager.RentalDetails.AsNoTracking().ToList();
-        }
-
         public List<RentalDetails> GetByRental(int rentalId)
         {
             return datamanager.RentalDetails.Where(d => d.RentalId == rentalId).ToList();
@@ -59,12 +54,6 @@ namespace Dal.Services
                 datamanager.RentalDetails.Remove(rentalDetails);
                 datamanager.SaveChanges();
             }
-        }
-
-        public RentalDetails GetRentalDetailsById(int id)
-        {
-            return datamanager.RentalDetails.Find(id)
-                ?? throw new ArgumentNullException(nameof(id), "These rental details don't exist.");
         }
 
         public void UpdateRentalDetails(RentalDetails rd)

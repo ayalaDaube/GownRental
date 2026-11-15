@@ -4,7 +4,6 @@ namespace Dal.Api
 {
     public interface IRentals
     {
-        List<Rental> GetRentals();
         Rental? GetRentalById(int id);
         void DeleteRental(int id);
         Rental CreateRental(Rental r);
