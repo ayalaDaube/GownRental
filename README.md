@@ -1,5 +1,8 @@
 # GownRental
 
+[![Server](https://github.com/ayalaDaube/GownRental/actions/workflows/server.yml/badge.svg)](https://github.com/ayalaDaube/GownRental/actions/workflows/server.yml)
+[![Client](https://github.com/ayalaDaube/GownRental/actions/workflows/client.yml/badge.svg)](https://github.com/ayalaDaube/GownRental/actions/workflows/client.yml)
+
 A full-stack web application for managing an evening-gown rental business: a gown catalog with per-size inventory, rentals with date-based availability, and fitting appointments, with separate views for customers and for the shop secretary.
 
 It was built as a team study project for a client who rents out evening gowns for events, and is now being developed further toward a production-quality product (see [Status](#status-and-roadmap)).
@@ -139,15 +142,35 @@ Staff sign in at http://localhost:3000/login. Visitors can use the home page and
 
 The server builds without warnings and treats nullability warnings as errors (`Server/Directory.Build.props`). The client is TypeScript in strict mode, ESLint rejects explicit `any` outside tests, and `CI=true npm run build` fails on any warning. Data is filtered by the database, never by loading whole tables into memory.
 
-### Run the tests
+## Testing
+
+About 600 automated tests protect the product. They are written from the **rules** of the business (what the shop needs, what a customer or the secretary expects), not from the code, and they check every limit on both sides: the last accepted value and the first refused one.
+
+| | Tests | Coverage (lines / branches) | What they cover |
+|---|---|---|---|
+| Server | 456 | 96% / 88% | every route against the security rules (discovered automatically, so a new endpoint cannot be forgotten), forged and expired tokens, hostile and broken input, every field limit, double booking, all-or-nothing orders, customers, appointments, the demo data on every weekday, and constraints of the database itself |
+| Client | 156 | 92% / 92% | the real HTTP client, the sign-in and routing of the whole app, and every screen followed through its flows (success, refusal, retry, double submit) with the Hebrew and English texts |
+
+Bugs found this way were fixed in the code, never by changing the test. As a check on the tests themselves, key rules were broken on purpose (double booking allowed, past dates allowed, the token never sent, staff pages open to everyone...) and the suites failed each time.
 
 ```bash
 cd Server
-dotnet test            # API integration tests (authentication, gowns, rentals, orders, customers, appointments)
+dotnet test            # API and business-rule tests, on an in-memory SQLite database
 
 cd ../Client
-npm test               # client tests (session, sign-in state, protected routes, state of gowns, rentals and appointments)
+npm test               # watch mode; add -- --watchAll=false for one run, or use npm run test:ci for coverage
 ```
+
+The server tests start the real API in memory with its real security and database constraints; only the database engine differs (SQLite instead of SQL Server). Coverage of the server excludes generated migrations (`Server/coverage.runsettings`).
+
+### Continuous integration
+
+Two GitHub Actions workflows run on every push and pull request (`.github/workflows`):
+
+- **Server:** build with warnings as errors, check that the migrations match the model, run the tests with coverage.
+- **Client:** `npm ci`, lint (no warnings), type check, tests with a coverage threshold, production build.
+
+Each pull request must be green before merging. To run a workflow by hand, open the **Actions** tab, choose the workflow and press **Run workflow**. The same checks can be run locally with the commands in the workflow files. To skip a run for a commit that changes nothing in the code (for example a typo in a document), put `[skip ci]` in the commit message.
 
 ## Status and roadmap
 
@@ -159,7 +182,7 @@ The core flows work end to end. The goal is a polished product, in this order:
 - [x] Real authentication (JWT) and role-based authorization instead of a client-side password
 - [x] Bug fixes in deletion, order placement and availability logic
 - [x] Code cleanup and strict typing in the client
-- [ ] Automated tests and continuous integration
+- [x] Automated tests and continuous integration
 - [ ] Right-to-left layout and real gown images
 
 ## Team
