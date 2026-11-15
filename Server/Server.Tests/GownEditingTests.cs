@@ -155,11 +155,12 @@ public class GownEditingTests
         using var app = NewApp();
         var client = await app.SignedInClientAsync();
 
-        var response = await client.PutAsJsonAsync("/api/Gowns/1", new { size = 37, price = 275, isActive = true });
+        // Gown 21 was never rented, so its size may be corrected (see GownRulesTests for gowns that were rented).
+        var response = await client.PutAsJsonAsync("/api/Gowns/21", new { size = 46, price = 275, isActive = true });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var stored = app.Query(db => db.ModelDetails.Find(1))!;
-        Assert.Equal(37, stored.Size);
+        var stored = app.Query(db => db.ModelDetails.Find(21))!;
+        Assert.Equal(46, stored.Size);
         Assert.Equal(275, stored.Price);
         Assert.Equal(1, stored.ModelId);
     }
