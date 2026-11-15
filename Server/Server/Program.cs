@@ -78,7 +78,6 @@ namespace Server
             });
 
             // Slow down password guessing: a limited number of login attempts per minute per client address.
-            var loginAttemptsPerMinute = builder.Configuration.GetValue("RateLimit:LoginPerMinute", 5);
             builder.Services.AddRateLimiter(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -87,7 +86,9 @@ namespace Server
                         httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                         _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = loginAttemptsPerMinute,
+                            // Read when the client's counter is created, so the limit follows the configuration.
+                            PermitLimit = httpContext.RequestServices.GetRequiredService<IConfiguration>()
+                                .GetValue("RateLimit:LoginPerMinute", 5),
                             Window = TimeSpan.FromMinutes(1),
                             QueueLimit = 0,
                         }));

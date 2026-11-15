@@ -25,7 +25,7 @@ namespace Bl.Models
         [Range(1, 100)]
         public int Size { get; set; }
 
-        [Range(1, 100000)]
+        [Range(1.0, 100000.0)]
         public double Price { get; set; }
     }
 
@@ -35,7 +35,7 @@ namespace Bl.Models
         [Range(1, 100)]
         public int Size { get; set; }
 
-        [Range(1, 100000)]
+        [Range(1.0, 100000.0)]
         public double Price { get; set; }
 
         /// <summary>False takes the gown out of the inventory (for example when it is damaged).</summary>

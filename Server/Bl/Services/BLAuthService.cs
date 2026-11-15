@@ -19,6 +19,9 @@ namespace Bl.Services
         private static readonly string DummyHash =
             new PasswordHasher<AppUser>().HashPassword(DummyUser, Guid.NewGuid().ToString("N"));
 
+        /// <summary>Usernames are not case sensitive: they are stored and looked up in lower case, so the rule does not depend on the database.</summary>
+        private static string NormalizeUsername(string username) => username.Trim().ToLowerInvariant();
+
         public BLAuthService(IDal dal)
         {
             users = dal.User;
@@ -31,7 +34,7 @@ namespace Bl.Services
                 return null;
             }
 
-            var user = users.GetByUsername(username.Trim());
+            var user = users.GetByUsername(NormalizeUsername(username));
             if (user == null)
             {
                 hasher.VerifyHashedPassword(DummyUser, DummyHash, password);
@@ -63,12 +66,13 @@ namespace Bl.Services
                 throw new ArgumentException($"Password must be at least {MinPasswordLength} characters.", nameof(password));
             }
 
-            if (users.GetByUsername(username.Trim()) != null)
+            var normalized = NormalizeUsername(username);
+            if (users.GetByUsername(normalized) != null)
             {
                 return;
             }
 
-            var user = new AppUser { Username = username.Trim(), Role = role };
+            var user = new AppUser { Username = normalized, Role = role };
             user.PasswordHash = hasher.HashPassword(user, password);
             users.Create(user);
         }
