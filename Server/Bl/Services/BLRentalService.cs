@@ -146,6 +146,7 @@ namespace Bl.Services
             {
                 throw new InvalidRequestException("The date cannot be in the past.");
             }
+            RentalRules.EnsureNotTooFarAhead(date, Today);
 
             var rangeStart = date.AddDays(-RentalRules.BufferDays);
             var rangeEnd = date.AddDays(RentalRules.BufferDays);
@@ -161,9 +162,13 @@ namespace Bl.Services
             {
                 throw new InvalidRequestException("A gown id is required.");
             }
-            if (requireFutureDate && request.EventDate < Today)
+            if (requireFutureDate)
             {
-                throw new InvalidRequestException("The event date cannot be in the past.");
+                if (request.EventDate < Today)
+                {
+                    throw new InvalidRequestException("The event date cannot be in the past.");
+                }
+                RentalRules.EnsureNotTooFarAhead(request.EventDate, Today);
             }
 
             var gown = gowns.GetGownDetailsById(request.GownId)
