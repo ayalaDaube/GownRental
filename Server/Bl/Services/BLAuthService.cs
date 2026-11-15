@@ -41,7 +41,7 @@ namespace Bl.Services
                 return null;
             }
 
-            var result = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
+            var result = Verify(user, password);
             if (result == PasswordVerificationResult.Failed)
             {
                 return null;
@@ -55,6 +55,19 @@ namespace Bl.Services
             }
 
             return new AuthenticatedUser(user.Id, user.Username, user.Role);
+        }
+
+        /// <summary>A stored password that cannot even be read (a damaged record) counts as a wrong password, never as a crash.</summary>
+        private PasswordVerificationResult Verify(AppUser user, string password)
+        {
+            try
+            {
+                return hasher.VerifyHashedPassword(user, user.PasswordHash, password);
+            }
+            catch (Exception ex) when (ex is FormatException or ArgumentException or OverflowException)
+            {
+                return PasswordVerificationResult.Failed;
+            }
         }
 
         public void EnsureUser(string username, string password, string role)
