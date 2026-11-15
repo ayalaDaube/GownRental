@@ -70,6 +70,17 @@ namespace Bl.Services
             }
         }
 
+        public bool EnsureFirstUser(string username, string password, string role)
+        {
+            if (users.Any())
+            {
+                return false;
+            }
+
+            EnsureUser(username, password, role);
+            return true;
+        }
+
         public void EnsureUser(string username, string password, string role)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Username is required.", nameof(username));

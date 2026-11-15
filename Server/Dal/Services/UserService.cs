@@ -18,6 +18,8 @@ namespace Dal.Services
             return dataManager.AppUsers.FirstOrDefault(u => u.Username == username);
         }
 
+        public bool Any() => dataManager.AppUsers.Any();
+
         public void Create(AppUser user)
         {
             ArgumentNullException.ThrowIfNull(user);

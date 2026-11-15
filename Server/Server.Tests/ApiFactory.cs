@@ -30,6 +30,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         Environment.SetEnvironmentVariable("Jwt__Key", SigningKey);
         Environment.SetEnvironmentVariable("RateLimit__LoginPerMinute", "1000");
         Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", "Server=unused");
+        Environment.SetEnvironmentVariable("Database__MigrateOnStartup", "false"); // the tests build their own SQLite database
     }
 
     // An in-memory SQLite database lives as long as its connection stays open.

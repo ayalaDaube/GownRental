@@ -108,7 +108,16 @@ Staff sign in with a username and password and receive a signed [JWT](https://jw
 
 **Development account.** In the Development environment the API creates one demo secretary on startup. Its username and password are defined under `Seed:Secretary` in `Server/Server/appsettings.Development.json`, together with a development-only signing key under `Jwt:Key`. These values exist for local use only.
 
-**Production.** Never reuse the development values. Provide a random signing key of at least 32 characters outside of source control, for example with an environment variable (`Jwt__Key`) or `dotnet user-secrets`, and set `Cors:AllowedOrigins` to the real client address. The API refuses to start without a valid signing key. Create the first staff account through your own provisioning process, since demo data and the demo account are only created in Development.
+**Production.** Never reuse the development values. Provide a random signing key of at least 32 characters outside of source control, for example with an environment variable (`Jwt__Key`) or `dotnet user-secrets`, and set `Cors:AllowedOrigins` to the real client address. The API refuses to start without a valid signing key. Demo data and the demo account are only created in Development.
+
+**First start in production.** Outside Development the server applies the database migrations itself on startup (set `Database__MigrateOnStartup=false` to turn that off) and creates the shop's first secretary from two environment variables, so no password is written in a file:
+
+```bash
+Bootstrap__Username=owner
+Bootstrap__Password=<at least 12 characters>
+```
+
+The account is created only while there are no accounts at all. At every later start the variables are ignored, so a restart never resets a password; remove them after the first start. Giving only one of the two, or a password shorter than 12 characters, stops the server with a clear message.
 
 ## Getting started
 
@@ -162,12 +171,12 @@ The server builds without warnings and treats nullability warnings as errors (`S
 
 ## Testing
 
-About 600 automated tests protect the product. They are written from the **rules** of the business (what the shop needs, what a customer or the secretary expects), not from the code, and they check every limit on both sides: the last accepted value and the first refused one.
+More than 600 automated tests protect the product. They are written from the **rules** of the business (what the shop needs, what a customer or the secretary expects), not from the code, and they check every limit on both sides: the last accepted value and the first refused one.
 
 | | Tests | Coverage (lines / branches) | What they cover |
 |---|---|---|---|
-| Server | 456 | 96% / 88% | every route against the security rules (discovered automatically, so a new endpoint cannot be forgotten), forged and expired tokens, hostile and broken input, every field limit, double booking, all-or-nothing orders, customers, appointments, the demo data on every weekday, and constraints of the database itself |
-| Client | 156 | 92% / 92% | the real HTTP client, the sign-in and routing of the whole app, and every screen followed through its flows (success, refusal, retry, double submit) with the Hebrew and English texts |
+| Server | 468 | 96% / 88% | every route against the security rules (discovered automatically, so a new endpoint cannot be forgotten), forged and expired tokens, hostile and broken input, every field limit, double booking, all-or-nothing orders, customers, appointments, the demo data on every weekday, and constraints of the database itself |
+| Client | 180 | 92% / 92% | the real HTTP client, the sign-in and routing of the whole app, and every screen followed through its flows (success, refusal, retry, double submit) with the Hebrew and English texts |
 
 Bugs found this way were fixed in the code, never by changing the test. As a check on the tests themselves, key rules were broken on purpose (double booking allowed, past dates allowed, the token never sent, staff pages open to everyone...) and the suites failed each time.
 
@@ -201,7 +210,8 @@ The core flows work end to end. The goal is a polished product, in this order:
 - [x] Bug fixes in deletion, order placement and availability logic
 - [x] Code cleanup and strict typing in the client
 - [x] Automated tests and continuous integration
-- [ ] Right-to-left layout and real gown images
+- [x] Right-to-left layout for the Hebrew pages, gown pictures, screenshots
+- [x] First-start provisioning for production (migrations and the first secretary)
 
 ## Team
 

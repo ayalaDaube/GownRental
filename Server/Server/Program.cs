@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Server.Auth;
 using Server.Errors;
+using Server.Startup;
 
 namespace Server
 {
@@ -154,6 +155,19 @@ namespace Server
                     scope.ServiceProvider.GetRequiredService<IBl>().BLAuth
                         .EnsureUser(seedUsername, seedPassword, Roles.Secretary);
                 }
+            }
+            else
+            {
+                using var scope = app.Services.CreateScope();
+
+                // A new installation builds its own database (and brings an old one up to date) when the server starts.
+                if (builder.Configuration.GetValue("Database:MigrateOnStartup", true))
+                {
+                    scope.ServiceProvider.GetRequiredService<DataManager>().Database.Migrate();
+                }
+
+                // The first secretary comes from the Bootstrap__Username / Bootstrap__Password environment variables.
+                FirstSecretary.CreateIfNeeded(scope.ServiceProvider.GetRequiredService<IBl>().BLAuth, builder.Configuration);
             }
 
             // Configure the HTTP request pipeline.
