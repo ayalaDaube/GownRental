@@ -39,8 +39,9 @@ describe('the list of rentals', () => {
 
     expect(screen.getByText('C000001')).toBeInTheDocument();
     expect(screen.getByText('C000002')).toBeInTheDocument();
-    expect(screen.getByText('2026-12-24')).toBeInTheDocument();
-    expect(screen.getByText('2026-12-30')).toBeInTheDocument();
+    expect(screen.getByText('24/12/2026')).toBeInTheDocument();
+    expect(screen.getByText('30/12/2026')).toBeInTheDocument();
+    expect(screen.getByText('01/11/2026')).toBeInTheDocument(); // the rental date, without the time
     expect(screen.getAllByText('Rental ID')).toHaveLength(2);
   });
 
@@ -155,7 +156,7 @@ describe('changing and deleting a rental', () => {
     await waitFor(() => expect(updateRental).toHaveBeenCalledWith({
       rentalId: 1, customerId: 'C000001', eventDate: '2027-01-05', gownId: 1,
     }));
-    expect(await screen.findByText('2027-01-05')).toBeInTheDocument();
+    expect(await screen.findByText('05/01/2027')).toBeInTheDocument();
   });
 
   test('a refused change shows the reason and leaves the rental as it was', async () => {
@@ -170,7 +171,7 @@ describe('changing and deleting a rental', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Gown 3 is already rented');
     expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
     userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(screen.getByText('2026-12-24')).toBeInTheDocument();
+    expect(screen.getByText('24/12/2026')).toBeInTheDocument();
   });
 
   test('editing and cancelling shows the original values again next time', async () => {

@@ -93,6 +93,21 @@
   box-shadow: 0 14px 30px rgba(95, 61, 106, 0.08);
 }
 
+.button-outline {
+  background: transparent;
+  color: #5f3d6a;
+  border: 2px solid #5f3d6a;
+  padding: 10px 20px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button-outline:hover {
+  background: #5f3d6a;
+  color: #fff;
+}
+
 .hero-visual {
   position: relative;
   min-height: 420px;
