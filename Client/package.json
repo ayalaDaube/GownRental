@@ -76,6 +76,14 @@
       "!src/index.tsx",
       "!src/setupTests.ts",
       "!src/testUtils.tsx"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 88,
+        "branches": 85,
+        "functions": 80,
+        "lines": 88
+      }
+    }
   }
 }

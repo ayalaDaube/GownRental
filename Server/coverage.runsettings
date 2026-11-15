@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <!-- Generated code and the test project itself say nothing about the quality of the product. -->
+          <ExcludeByFile>**/Migrations/**/*.cs</ExcludeByFile>
+          <Exclude>[Server.Tests]*</Exclude>
+          <Format>cobertura</Format>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

@@ -54,7 +54,7 @@ jobs:
       - name: Test
         run: >
           dotnet test --no-build --configuration Release
-          --collect:"XPlat Code Coverage" --results-directory ./coverage
+          --settings coverage.runsettings --results-directory ./coverage
 
       - name: Keep the coverage report
         if: always()
