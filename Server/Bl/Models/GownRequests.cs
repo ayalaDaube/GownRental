@@ -19,7 +19,7 @@ namespace Bl.Models
         [StringLength(200)]
         public string? Description { get; set; }
 
-        [Url, StringLength(500)]
+        [HttpUrl, StringLength(500)]
         public string? ImageUrl { get; set; }
 
         [Range(1, 100)]
@@ -54,7 +54,7 @@ namespace Bl.Models
         [StringLength(200)]
         public string? Description { get; set; }
 
-        [Url, StringLength(500)]
+        [HttpUrl, StringLength(500)]
         public string? ImageUrl { get; set; }
     }
 }

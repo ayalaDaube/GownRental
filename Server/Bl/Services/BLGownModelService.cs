@@ -208,6 +208,12 @@ namespace Bl.Services
                 {
                     throw new ConflictException($"Gown model {current.ModelId} already has size {request.Size}.");
                 }
+                // The rentals of a gown record the size it had. Correcting the size afterwards would make them lie.
+                if (request.Size != current.Size && rentalDetails.ExistsForGown(gownId))
+                {
+                    throw new ConflictException(
+                        $"Gown {gownId} has rental history, so its size cannot be changed. Add a new gown for the other size.");
+                }
 
                 gownDetails.UpdateGownDetails(new Dal.Models.ModelDetails
                 {
@@ -250,7 +256,7 @@ namespace Bl.Services
         public List<ModelGrouped> GetGroupedGowns()
         {
             var allGowns = GetFullGowns();
-            var groups = allGowns.GroupBy(g => g.ModelId);
+            var groups = allGowns.GroupBy(g => g.ModelId).OrderBy(group => group.Key);
             var result = groups.Select(group => new ModelGrouped
             {
                 Id = group.First().ModelId,
@@ -258,7 +264,7 @@ namespace Bl.Services
                 Color = group.First().Color ?? string.Empty,
                 Description = group.First().Description,
                 Image = group.First().ImageUrl,
-                Details = group.Select(g => new GownSizeInfo
+                Details = group.OrderBy(g => g.Size).Select(g => new GownSizeInfo
                 {
                     GownId = g.Id,
                     ModelId = g.ModelId,
